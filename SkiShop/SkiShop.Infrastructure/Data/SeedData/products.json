@@ -1,0 +1,74 @@
+[
+    {
+        "name": "Angular Snowboard",
+        "description": "A high-performance snowboard for angular riders seeking precision turns on groomed runs.",
+        "price": 199.99,
+        "pictureUrl": "images/products/sb-ang1.png",
+        "type": "Boards",
+        "brand": "Angular",
+        "quantityInStock": 100
+    },
+    {
+        "name": "React Snowboard",
+        "description": "Ride the slopes with the latest React-powered snowboard, engineered for speed and stability.",
+        "price": 189.99,
+        "pictureUrl": "images/products/sb-react1.png",
+        "type": "Boards",
+        "brand": "React",
+        "quantityInStock": 100
+    },
+    {
+        "name": "TypeScript Snowboard",
+        "description": "Strongly typed performance on any slope. The TypeScript snowboard offers unmatched control.",
+        "price": 219.99,
+        "pictureUrl": "images/products/sb-ts1.png",
+        "type": "Boards",
+        "brand": "TypeScript",
+        "quantityInStock": 100
+    },
+    {
+        "name": "NetCore Snowboard",
+        "description": "Cross-platform snowboard built for any terrain. Lightweight yet durable.",
+        "price": 240.00,
+        "pictureUrl": "images/products/sb-core1.png",
+        "type": "Boards",
+        "brand": "NetCoreSki",
+        "quantityInStock": 100
+    },
+    {
+        "name": "Angular Ski Boots",
+        "description": "Angular precision ski boots with excellent ankle support.",
+        "price": 150.00,
+        "pictureUrl": "images/products/boot-ang1.png",
+        "type": "Boots",
+        "brand": "Angular",
+        "quantityInStock": 100
+    },
+    {
+        "name": "React Ski Boots",
+        "description": "Reactive fit boots that mold to your foot for maximum comfort on the mountain.",
+        "price": 130.00,
+        "pictureUrl": "images/products/boot-react1.png",
+        "type": "Boots",
+        "brand": "React",
+        "quantityInStock": 100
+    },
+    {
+        "name": "Core Ski Gloves",
+        "description": "Warm and waterproof gloves for the coldest of days on the slopes.",
+        "price": 79.99,
+        "pictureUrl": "images/products/glove-core1.png",
+        "type": "Gloves",
+        "brand": "NetCoreSki",
+        "quantityInStock": 100
+    },
+    {
+        "name": "React Ski Gloves",
+        "description": "Touchscreen-compatible ski gloves with thermal lining.",
+        "price": 89.99,
+        "pictureUrl": "images/products/glove-react1.png",
+        "type": "Gloves",
+        "brand": "React",
+        "quantityInStock": 100
+    }
+]
