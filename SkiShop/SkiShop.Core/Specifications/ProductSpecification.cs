@@ -1,40 +1,32 @@
-﻿using SkiShop.Core.Entities;
+﻿
+using SkiShop.Core.Entities;
+using SkiShop.Core.Specifications;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SkiShop.Core.Specifications
+namespace Core.Specifications;
+
+public class ProductSpecification : BaseSpecification<Product>
 {
-    public class ProductSpecification : BaseSpecification<Product>
+    public ProductSpecification(ProductSpecParams productParams)
+        : base(x =>
+            (string.IsNullOrEmpty(productParams.Search)
+                || x.Name.ToLower().Contains(productParams.Search)) &&
+            (!productParams.Brands.Any() || productParams.Brands.Contains(x.Brand)) &&
+            (!productParams.Types.Any() || productParams.Types.Contains(x.Type)))
     {
-        public ProductSpecification(string? brand, string? type, string? sort)
-            : base(p =>
-                (string.IsNullOrEmpty(brand) || p.Brand == brand) &&
-                (string.IsNullOrEmpty(type) || p.Type == type))
+        ApplyPaging(productParams.PageSize * (productParams.PageIndex - 1), productParams.PageSize);
+
+        switch (productParams.Sort)
         {
-            if (!string.IsNullOrEmpty(sort))
-            {
-                switch (sort)
-                {
-                    case "priceAsc":
-                        AddOrderBy(p => p.Price);
-                        break;
-                    case "priceDesc":
-                        AddOrderByDescending(p => p.Price);
-                        break;
-                    default:
-                        AddOrderBy(p => p.Name);
-                        break;
-                }
-            }
-            else
-            {
-                AddOrderBy(p => p.Name);
-            }
-
-
+            case "priceAsc":
+                AddOrderBy(x => x.Price);
+                break;
+            case "priceDesc":
+                AddOrderByDescending(x => x.Price);
+                break;
+            default:
+                AddOrderBy(x => x.Name);
+                break;
         }
     }
 }
