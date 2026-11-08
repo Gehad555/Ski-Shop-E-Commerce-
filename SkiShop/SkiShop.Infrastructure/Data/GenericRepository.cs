@@ -2,9 +2,7 @@
 using SkiShop.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using SkiShop.Infrastructure.Data;
-using System;
 using Core.Interfaces;
-
 namespace Infrastructure.Data;
 
 public class GenericRepository<T>(StoreContext context) : IGenericRepository<T> where T : BaseEntity
@@ -73,5 +71,14 @@ public class GenericRepository<T>(StoreContext context) : IGenericRepository<T> 
     private IQueryable<TResult> ApplySpecification<TResult>(ISpecification<T, TResult> spec)
     {
         return SpecificationEvaluator<T>.GetQuery<T, TResult>(context.Set<T>().AsQueryable(), spec);
+    }
+
+    public async Task<int> CountAsync(ISpecification<T> spec)
+    {
+       var quary = context.Set<T>().AsQueryable();
+
+        quary = spec.ApplyCriteria(quary);
+
+        return await quary.CountAsync();
     }
 }

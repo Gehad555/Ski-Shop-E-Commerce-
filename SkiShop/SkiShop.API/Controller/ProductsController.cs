@@ -1,4 +1,5 @@
 ﻿using Core.Interfaces;
+using Core.Specifications;
 using Microsoft.AspNetCore.Mvc;
 using SkiShop.Core.Entities;
 using SkiShop.Core.Specifications;
@@ -7,16 +8,14 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController(IGenericRepository<Product> repo) : ControllerBase
+public class ProductsController(IGenericRepository<Product> repo) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, string? type, string? sort)
+    public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery] ProductSpecParams productParams)
     {
-        var spec = new ProductSpecification(brand, type, sort);
+        var spec = new ProductSpecification(productParams);
 
-        var products = await repo.ListAsync(spec);
-
-        return Ok(products);
+       return await CreatePagedResult(repo, spec, productParams.PageIndex, productParams.PageSize);
     }
 
 
