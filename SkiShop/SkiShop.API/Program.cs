@@ -38,6 +38,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.UseStaticFiles();
+
 app.UseCors(x =>x
     .AllowAnyHeader()
     .AllowAnyMethod()

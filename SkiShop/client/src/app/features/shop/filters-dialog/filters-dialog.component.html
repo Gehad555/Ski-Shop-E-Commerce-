@@ -1,0 +1,36 @@
+<div class="min-w-[500px]">
+  <div class="bg-blue-600 text-white px-6 py-4 rounded-t-lg">
+    <h3 class="text-2xl font-bold text-center">Filters</h3>
+  </div>
+  <div class="flex p-6 gap-6">
+    <div class="w-1/2">
+      <h4 class="font-semibold text-lg text-blue-600 mb-2 flex items-center gap-2">
+        <mat-icon class="text-blue-600">label</mat-icon>
+        Brands
+      </h4>
+      <mat-divider></mat-divider>
+      <mat-selection-list [(ngModel)]="selectedBrands" [multiple]="true" class="!mt-2">
+        @for (brand of shopService.brands; track brand) {
+          <mat-list-option [value]="brand" class="!rounded-lg !mb-1">{{brand}}</mat-list-option>
+        }
+      </mat-selection-list>
+    </div>
+    <div class="w-1/2">
+      <h4 class="font-semibold text-lg text-blue-600 mb-2 flex items-center gap-2">
+        <mat-icon class="text-blue-600">category</mat-icon>
+        Types
+      </h4>
+      <mat-divider></mat-divider>
+      <mat-selection-list [(ngModel)]="selectedTypes" [multiple]="true" class="!mt-2">
+        @for (type of shopService.types; track type) {
+          <mat-list-option [value]="type" class="!rounded-lg !mb-1">{{type}}</mat-list-option>
+        }
+      </mat-selection-list>
+    </div>
+  </div>
+  <div class="flex justify-end px-6 pb-4">
+    <button mat-flat-button (click)="applyFilters()" class="!bg-blue-600 !text-white !px-8 !py-2 !rounded-lg hover:!bg-blue-700 !text-base">
+      Apply Filters
+    </button>
+  </div>
+</div>
