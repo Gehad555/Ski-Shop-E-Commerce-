@@ -6,5 +6,9 @@
   @apply mx-auto max-w-screen-2xl;
 }
 
+.match-input-height {
+  height: 56px !important;
+}
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
