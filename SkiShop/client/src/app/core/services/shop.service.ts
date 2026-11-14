@@ -30,11 +30,12 @@ export class ShopService {
 
     params = params.append('sort', ShopParams.sort);
 
+    params = params.append('pageIndex', ShopParams.pageNumber.toString());
     params = params.append('pageNumber', ShopParams.pageNumber.toString());
     params = params.append('pageSize', ShopParams.pageSize.toString());
 
-    if (ShopParams.search) {
-      params = params.append('search', ShopParams.search);
+    if (ShopParams.search && ShopParams.search.trim()) {
+      params = params.append('search', ShopParams.search.trim());
     }
 
     return this.http.get<Pagination<Product>>(this.baseUrl + 'products', { params: params });

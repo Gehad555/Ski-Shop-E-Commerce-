@@ -11,12 +11,13 @@
         class="relative flex items-center w-full max-w-md mx-4">
       <input 
           type="search"
-          class="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-xl bg-white focus:border-blue-500 focus:ring-blue-500 shadow-sm"
+          class="block w-full p-4 pr-12 text-sm text-gray-900 border border-gray-300 rounded-xl bg-white focus:border-blue-500 focus:ring-blue-500 shadow-sm outline-none"
           placeholder="Search products..." 
           name="search"
+          (search)="onSearchChange()"
           [(ngModel)]="shopParams.search" />
       <button mat-icon-button type="submit"
-          class="absolute inset-y-0 right-8 top-2 flex items-center pl-3">
+          class="!absolute !right-2 !top-1/2 !-translate-y-1/2 flex items-center justify-center">
         <mat-icon class="text-blue-500">search</mat-icon>
       </button>
     </form>
