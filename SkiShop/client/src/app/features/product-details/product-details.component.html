@@ -1,18 +1,22 @@
+
 @if (product) {
 <section class="py-8">
   <div class="max-w-screen-2xl px-4 mx-auto">
     <div class="grid grid-cols-2 gap-8">
-      
+
       <!-- Product Image -->
       <div class="max-w-xl mx-auto">
-        <img class="w-full"
-             [src]="'/' + product.pictureUrl"
-             (error)="$any($event.target).src = '/images/placeholder.png'"
-             alt="{{product.name}}" />
+        <img
+          class="w-full"
+          [src]="'/' + product.pictureUrl"
+          (error)="$any($event.target).src = '/images/placeholder.png'"
+          alt="{{product.name}}"
+        />
       </div>
 
       <!-- Product Details -->
       <div class="mt-6 sm:mt-8 lg:mt-0">
+
         <h1 class="text-2xl font-semibold text-gray-900">
           {{product.name}}
         </h1>
@@ -23,21 +27,35 @@
           </p>
         </div>
 
+        <!-- Add to Cart & Quantity -->
         <div class="flex gap-4 mt-6 items-center">
           <button mat-flat-button class="match-input-height">
             <mat-icon>shopping_cart</mat-icon>
             Add to cart
           </button>
 
-          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-36">
+          <mat-form-field
+            appearance="outline"
+            subscriptSizing="dynamic"
+            class="w-36 quantity-field">
+
             <mat-label>Quantity</mat-label>
-            <input matInput type="number" [(ngModel)]="quantity" min="1">
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="quantity"
+              min="1"
+            >
           </mat-form-field>
         </div>
 
-        <mat-divider class="my-6"></mat-divider>
+        <!-- Divider -->
+        <div class="mt-10 mb-6">
+          <mat-divider></mat-divider>
+        </div>
 
-        <p class="mt-6 text-gray-500 leading-relaxed">
+        <!-- Product Description -->
+        <p class="text-gray-500 leading-relaxed">
           {{product.description}}
         </p>
 
