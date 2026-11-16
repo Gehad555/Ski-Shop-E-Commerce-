@@ -5,7 +5,15 @@
   "projects": {
     "client": {
       "projectType": "application",
-      "schematics": {},
+       "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss",
+      "type": "component"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -27,6 +35,7 @@
             "styles": [
               "src/custom-theme.scss",
               "src/styles.css"
+
             ]
           },
           "configurations": {

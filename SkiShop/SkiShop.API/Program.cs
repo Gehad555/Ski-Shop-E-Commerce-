@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using SkiShop.API.Middleware;
 using SkiShop.Core.Interfaces;
 using SkiShop.Infrastructure.Data;
+using SkiShop.Infrastructure.Services;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,18 @@ Console.WriteLine($"CONNECTION STRING = {connectionString}");
 
 builder.Services.AddDbContext<StoreContext>(options =>
     options.UseSqlServer(connectionString));
+
+
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
+{
+    var connString = builder.Configuration.GetConnectionString("Redis")
+        ?? throw new Exception("Cannot get redis connection string");
+    var configuration = ConfigurationOptions.Parse(connString, true);
+    return ConnectionMultiplexer.Connect(configuration);
+});
+
+builder.Services.AddScoped<ICartService, CartService>();
 
 
 builder.Services.AddScoped<IProductRepository,ProductRepository>();
@@ -37,6 +51,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseStaticFiles();
 
 app.UseCors(x =>x
     .AllowAnyHeader()

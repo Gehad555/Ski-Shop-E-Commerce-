@@ -1,0 +1,38 @@
+﻿using SkiShop.Core.Entities;
+using SkiShop.Core.Interfaces;
+using StackExchange.Redis;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace SkiShop.Infrastructure.Services
+{
+    public class CartService(IConnectionMultiplexer redis) : ICartService
+    {
+        private readonly IDatabase _database = redis.GetDatabase();
+        public async Task<bool> DeleteCartAsync(string key)
+        {
+            return await _database.KeyDeleteAsync(key);
+           
+        }
+
+        public async Task<AppShoppingCart?> GetCartAsync(string key)
+        {
+            var data = await _database.StringGetAsync(key);
+
+            return data.IsNullOrEmpty? null : JsonSerializer.Deserialize<AppShoppingCart?>(data);
+        }
+      
+        public async Task<AppShoppingCart?> SetCartAsync(AppShoppingCart cart)
+        {
+           var created = await _database.StringSetAsync(cart.Id, JsonSerializer.Serialize(cart), TimeSpan.FromDays(30));
+
+            if(!created) return null;
+
+            return await GetCartAsync(cart.Id);
+        }
+    }
+}
