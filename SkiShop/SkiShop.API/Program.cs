@@ -5,6 +5,8 @@ using SkiShop.API.Middleware;
 using SkiShop.Core.Entities;
 using SkiShop.Core.Interfaces;
 using SkiShop.Infrastructure.Data;
+using SkiShop.Infrastructure.Services;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +19,6 @@ builder.Services.AddDbContext<StoreContext>(options =>
     options.UseSqlServer(connectionString));
 
 
-<<<<<<< Updated upstream
-=======
 
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<AppUser>()
@@ -35,7 +35,9 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 builder.Services.AddScoped<ICartService, CartService>();
 
 
->>>>>>> Stashed changes
+
+
+
 builder.Services.AddScoped<IProductRepository,ProductRepository>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -57,6 +59,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseStaticFiles();
 
 app.UseCors(x =>x
     .AllowAnyHeader()
