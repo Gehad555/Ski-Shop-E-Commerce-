@@ -1,0 +1,42 @@
+<div class="mx-auto flex-1 space-y-6 w-full">
+    <div class="space-y-4 rounded-lg border border-gray-300 bg-(--mat-sys-surface) p-4 shadow-sm">
+        <p class="text-xl font-semibold">Order summary</p>
+        <div class="space-y-4">
+            <dl class="flex items-center justify-between gap-4">
+                <dt class="font-light">Subtotal</dt>
+                <dd>{{cartService.totals().subtotal | currency}}</dd>
+            </dl>
+            <dl class="flex items-center justify-between gap-4">
+                <dt class="font-light">Discount</dt>
+                <dd class="text-green-600">{{-cartService.totals().discount | currency}}</dd>
+            </dl>
+            <dl class="flex items-center justify-between gap-4">
+                <dt class="font-light">Delivery fee</dt>
+                <dd>{{cartService.totals().shipping | currency}}</dd>
+            </dl>
+            <dl class="flex items-center justify-between gap-4">
+                <dt class="font-light">Total</dt>
+                <dd>{{cartService.totals().total | currency}}</dd>
+            </dl>
+        </div>
+
+        <div class="flex flex-col gap-2">   
+            <button mat-flat-button routerLink="/checkout">Checkout</button>
+            <button mat-button routerLink="/shop">Continue shopping</button>
+        </div>
+
+    </div>
+
+    <div class="rounded-lg border border-gray-300 bg-(--mat-sys-surface) p-4 shadow-sm">
+        <form class="space-y-3 flex flex-col">
+            <label class="block text-sm font-medium text-gray-700">Do you have a voucher code?</label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
+                <mat-label>Voucher code&nbsp;&nbsp;</mat-label>
+                <input type="text" matInput>
+            </mat-form-field>
+
+            <button mat-flat-button type="button" class="w-full">Apply code</button>
+        </form>
+    </div>
+
+</div>

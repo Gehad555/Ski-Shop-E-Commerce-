@@ -15,5 +15,19 @@
   height: 56px !important;
 }
 
+/* Fix Tailwind base interference with Angular Material form fields */
+.mat-mdc-form-field .mdc-notched-outline__notch {
+  padding-right: 14px !important;
+}
+
+.mat-mdc-form-field input,
+input.mat-mdc-input-element,
+input[matInput] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

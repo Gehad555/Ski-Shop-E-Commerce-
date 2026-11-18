@@ -4,18 +4,18 @@ import { OrderSummaryComponent } from '../orders/order-summary/order-summary.com
 import CartService from '../../core/services/cart.service';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { Router } from '@angular/router';
+
 @Component({
-  imports: [CartItem  , OrderSummaryComponent , EmptyStateComponent ],
+  imports: [CartItem, OrderSummaryComponent, EmptyStateComponent],
   selector: 'app-cart',
   styleUrl: './cart.component.scss',
   templateUrl: './cart.component.html',
 })
 export class CartComponent {
   protected cartService = inject(CartService);
-   private router = inject(Router);
+  private router = inject(Router);
 
-
-    onAction() {
+  onAction() {
     void this.router.navigateByUrl('/shop');
   }
 }
