@@ -1,37 +1,79 @@
-<mat-card class="max-w-lg mx-auto mt-8 p-8 bg-(--mat-sys-surface)!">
-    <form (submit)="onSubmit($event)">
-        <div class="flex justify-center mb-6 items-center">
-            <h1 class="text-3xl font-semibold text-primary">Register</h1>
-        </div>
-        <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>First name</mat-label>
-            <input matInput [(ngModel)]="firstName" name="firstName" type="text" placeholder="John">
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>Last name</mat-label>
-            <input matInput [(ngModel)]="lastName" name="lastName" type="text" placeholder="Doe">
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>Email</mat-label>
-            <input matInput [(ngModel)]="email" name="email" type="email" placeholder="email@example.com">
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="w-full mb-4">
-            <mat-label>Password</mat-label>
-            <input matInput [(ngModel)]="password" name="password" type="password" placeholder="password">
+<div class="min-h-[75vh] flex items-center justify-center px-4 py-8">
+  <mat-card class="w-full max-w-lg p-8 shadow-lg rounded-2xl border border-gray-100 bg-white">
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-violet-100 text-violet-600 mb-3">
+        <mat-icon class="scale-125">person_add</mat-icon>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800">Create an Account</h1>
+      <p class="text-sm text-gray-500 mt-1">Join SkiShop and start shopping today</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-1">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>First name</mat-label>
+          <input matInput formControlName="firstName" type="text" placeholder="John">
+          <mat-icon matPrefix class="mr-2 text-gray-400">person</mat-icon>
+          @if (registerForm.get('firstName')?.hasError('required') && registerForm.get('firstName')?.touched) {
+            <mat-error>First name is required</mat-error>
+          }
         </mat-form-field>
 
-        @if (validationErrors().length > 0) {
-            <div class="mb-3 -mt-6 p-4 bg-red-100 text-red-500">
-                <ul class="list-disc px-3">
-                    @for (error of validationErrors(); track error) {
-                        <li>{{error}}</li>
-                    }
-                </ul>
-            </div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Last name</mat-label>
+          <input matInput formControlName="lastName" type="text" placeholder="Doe">
+          <mat-icon matPrefix class="mr-2 text-gray-400">person_outline</mat-icon>
+          @if (registerForm.get('lastName')?.hasError('required') && registerForm.get('lastName')?.touched) {
+            <mat-error>Last name is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="w-full mb-1">
+        <mat-label>Email address</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="name@example.com">
+        <mat-icon matPrefix class="mr-2 text-gray-400">email</mat-icon>
+        @if (registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched) {
+          <mat-error>Email is required</mat-error>
         }
+        @if (registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched) {
+          <mat-error>Please enter a valid email address</mat-error>
+        }
+      </mat-form-field>
 
-        <button [disabled]="loading()" mat-flat-button type="submit" class="w-full py-2">
-            {{loading() ? 'Registering...' : 'Register'}}
+      <mat-form-field appearance="outline" class="w-full mb-2">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" placeholder="At least 6 characters">
+        <mat-icon matPrefix class="mr-2 text-gray-400">lock</mat-icon>
+        <button mat-icon-button matSuffix type="button" (click)="hidePassword.set(!hidePassword())" class="text-gray-400">
+          <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
+        @if (registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched) {
+          <mat-error>Password is required</mat-error>
+        }
+        @if (registerForm.get('password')?.hasError('minlength') && registerForm.get('password')?.touched) {
+          <mat-error>Password must be at least 6 characters</mat-error>
+        }
+      </mat-form-field>
+
+      @if (validationErrors().length > 0) {
+        <div class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+          <ul class="list-disc list-inside space-y-1">
+            @for (error of validationErrors(); track error) {
+              <li>{{error}}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      <button [disabled]="registerForm.invalid || loading()" mat-flat-button type="submit" class="w-full py-2.5 text-base font-medium rounded-lg mt-2">
+        {{loading() ? 'Creating account...' : 'Create account'}}
+      </button>
+
+      <p class="text-center text-sm text-gray-600 mt-6">
+        Already have an account? 
+        <a routerLink="/account/login" class="text-violet-600 font-semibold hover:underline cursor-pointer">Sign in</a>
+      </p>
     </form>
-</mat-card>
+  </mat-card>
+</div>
