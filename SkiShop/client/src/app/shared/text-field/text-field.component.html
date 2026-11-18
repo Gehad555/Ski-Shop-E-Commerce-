@@ -1,0 +1,5 @@
+
+<mat-form-field appearance="outline" class="w-full mb-4">
+    <mat-label>{{label()}}</mat-label>
+    <input matInput [value]="value()" (input)="onInput($event)" [type]="type()" [placeholder]="placeholder()">
+</mat-form-field>
