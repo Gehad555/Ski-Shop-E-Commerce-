@@ -1,0 +1,11 @@
+.delete-btn {
+  color: #dc2626 !important;
+
+  mat-icon {
+    color: #dc2626 !important;
+  }
+
+  &:hover {
+    background-color: #fef2f2 !important;
+  }
+}
