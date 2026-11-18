@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+mat-form-field {
+  width: 100%;
+
+  ::ng-deep .mdc-notched-outline__notch {
+    padding-right: 14px !important;
+  }
+
+  ::ng-deep .mat-mdc-floating-label {
+    padding-right: 10px !important;
+  }
+
+  ::ng-deep input.mat-mdc-input-element,
+  ::ng-deep input {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+}
