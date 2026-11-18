@@ -1,6 +1,8 @@
 ﻿using API.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkiShop.API.DTOs;
+using System.Security.Claims;
 
 namespace SkiShop.API.Controller
 {
@@ -33,6 +35,19 @@ namespace SkiShop.API.Controller
         public IActionResult GetValidationError(CreateProductDto product)
         {
             return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("secret")]
+
+        public IActionResult GetSecret()
+        {
+            var name = User.FindFirst(ClaimTypes.Name)?.Value;
+
+            var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            return Ok("Hello " + name + " with the id of " + id);
+
         }
 
 

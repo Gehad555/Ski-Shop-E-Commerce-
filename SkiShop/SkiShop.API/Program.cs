@@ -2,6 +2,7 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using SkiShop.API.Middleware;
+using SkiShop.Core.Entities;
 using SkiShop.Core.Interfaces;
 using SkiShop.Infrastructure.Data;
 using SkiShop.Infrastructure.Services;
@@ -19,6 +20,10 @@ builder.Services.AddDbContext<StoreContext>(options =>
 
 
 
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<AppUser>()
+    .AddEntityFrameworkStores<StoreContext>();
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 {
     var connString = builder.Configuration.GetConnectionString("Redis")
@@ -28,6 +33,9 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 });
 
 builder.Services.AddScoped<ICartService, CartService>();
+
+
+
 
 
 builder.Services.AddScoped<IProductRepository,ProductRepository>();
@@ -65,6 +73,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGroup("api").MapIdentityApi<AppUser>();
 
 try
 {
