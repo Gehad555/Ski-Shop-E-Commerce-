@@ -20,6 +20,24 @@ namespace SkiShop.Infrastructure.Data
                 context.Products.AddRange(products);
                 await context.SaveChangesAsync();
             }
+            if (!context.DeliveryMethods.Any())
+            {
+                var dmPath = Path.Combine(AppContext.BaseDirectory, "Data", "SeedData", "delivery.json");
+                var dmData = await File.ReadAllTextAsync(dmPath);
+
+                var options2 = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var methods = JsonSerializer.Deserialize<List<DeliveryMethod>>(dmData, options2);
+
+                if (methods == null) return;
+
+                context.DeliveryMethods.AddRange(methods);
+
+                await context.SaveChangesAsync();
+            }
+
+
+
+
         }
     }
 }

@@ -34,7 +34,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 
 builder.Services.AddScoped<ICartService, CartService>();
 
-
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 
 
