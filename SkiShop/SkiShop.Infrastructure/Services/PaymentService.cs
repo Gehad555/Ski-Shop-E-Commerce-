@@ -70,6 +70,7 @@ namespace SkiShop.Infrastructure.Services
                     Amount = (long)cart.Items.Sum(i => i.Quantity * (i.Price * 100)) + (long)shippingPrice * 100,
                 };
                 intent = await service.UpdateAsync(cart.PaymentIntentId, options);
+                cart.ClientSecret = intent.ClientSecret;
             }
 
             await cartService.SetCartAsync(cart);

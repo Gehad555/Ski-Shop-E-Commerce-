@@ -1,5 +1,22 @@
-
-<mat-form-field appearance="outline" class="w-full mb-4">
-    <mat-label>{{label()}}</mat-label>
-    <input matInput [value]="value()" (input)="onInput($event)" [type]="type()" [placeholder]="placeholder()">
+<mat-form-field appearance="outline" class="w-full">
+  <mat-label>{{ label() }}</mat-label>
+  <input 
+    matInput 
+    [type]="type()" 
+    [placeholder]="placeholder()" 
+    [formControl]="control()"
+  />
+  @if (control().invalid && control().touched) {
+    <mat-error>
+      @if (control().hasError('required')) {
+        {{ label() }} is required
+      }
+      @if (control().hasError('email')) {
+        Invalid email address
+      }
+      @if (control().hasError('minlength')) {
+        {{ label() }} is too short
+      }
+    </mat-error>
+  }
 </mat-form-field>
