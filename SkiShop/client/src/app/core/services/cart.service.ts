@@ -3,6 +3,8 @@ import { inject, Injectable, signal , computed } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { Cart, Item } from '../../shared/models/cart';
 import { Product } from '../../shared/models/product';
+import { firstValueFrom } from 'rxjs';
+import { DeliveryMethod } from '../../shared/models/delivery';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +16,7 @@ export default class CartService {
      private cartId = signal<string | null>(localStorage.getItem('cart_id'));
 
      loading = signal(false);
+     selectedDelivery = signal<DeliveryMethod | null>(null);
 
         cartResource = httpResource<Cart>(() => this.cartId() 
         ? `${this.baseUrl}cart?id=${this.cartId()}` : undefined);
@@ -25,9 +28,10 @@ export default class CartService {
 
     totals = computed(() => {
         const items = this.cartResource.value()?.items;
+        const delivery = this.selectedDelivery();
 
         const subtotal = items?.reduce((sum, item) => sum + item.price * item.quantity, 0) ?? 0;
-        const shipping = 0;
+        const shipping = delivery ? delivery.price : 0;
         const discount = 0;
         const total = subtotal + shipping - discount;
 
@@ -40,15 +44,16 @@ export default class CartService {
     })
 
 
-     setCart(cart: Cart) {
+     async setCart(cart: Cart) {
         this.loading.set(true);
-        this.http.post<Cart>(`${this.baseUrl}cart`, cart).subscribe({
-            next: cart => {
-                this.cartId.set(cart.id);
-                this.cartResource.set(cart);
-            },
-            complete: () => this.loading.set(false)
-        })
+        try {
+            const updatedCart = await firstValueFrom(this.http.post<Cart>(`${this.baseUrl}cart`, cart));
+            this.cartId.set(updatedCart.id);
+            this.cartResource.set(updatedCart);
+            return updatedCart;
+        } finally {
+            this.loading.set(false);
+        }
     }
 
 
