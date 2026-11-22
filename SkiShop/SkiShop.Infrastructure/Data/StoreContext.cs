@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SkiShop.Core.Entities;
+using SkiShop.Core.Entities.OrderAggregate;
 
 namespace SkiShop.Infrastructure.Data
 {
@@ -10,6 +11,9 @@ namespace SkiShop.Infrastructure.Data
        public DbSet<Product> Products { get; set; }
 
         public DbSet<Address> Addresss { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         public DbSet<DeliveryMethod> DeliveryMethods { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

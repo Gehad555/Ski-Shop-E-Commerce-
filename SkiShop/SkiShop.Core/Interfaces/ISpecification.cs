@@ -14,6 +14,9 @@ namespace SkiShop.Core.Interfaces
         Expression<Func<T, object>>? OrderBy { get; }
         Expression<Func<T, object>>? OrderByDescending { get; }
 
+
+        List<Expression<Func<T, object>>> Includes { get; }
+        List<string> IncludeStrings { get; }
         bool Isdistinct { get; }
 
         int Take { get; }

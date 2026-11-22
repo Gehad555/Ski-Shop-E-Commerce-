@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkiShop.Core.Entities;
 using System;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace SkiShop.Infrastructure.Config
