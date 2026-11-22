@@ -18,15 +18,28 @@ namespace SkiShop.Core.Specifications
 
         public bool Isdistinct { get; private set; }
 
+        public List<Expression<Func<T, object>>> Includes { get; } = new();
+
+        public List<string> IncludeStrings { get; } = new();
 
         protected void AddOrderBy(Expression<Func<T, object>> orderByExpression)
         {
-            OrderBy = orderByExpression ?? throw new ArgumentNullException(nameof(orderByExpression));
+            OrderBy = orderByExpression;
         }
 
-        protected void AddOrderByDescending(Expression<Func<T, object>> orderByDescendingExpression)
+        protected void AddOrderByDescending(Expression<Func<T, object>> orderByDescExpression)
         {
-            OrderByDescending = orderByDescendingExpression ?? throw new ArgumentNullException(nameof(orderByDescendingExpression));
+            OrderByDescending = orderByDescExpression;
+        }
+
+        protected void AddInclude(Expression<Func<T, object>> includeExpression)
+        {
+            Includes.Add(includeExpression);
+        }
+
+        protected void AddInclude(string includeString)
+        {
+            IncludeStrings.Add(includeString);
         }
 
         protected void ApplyDistinct()
