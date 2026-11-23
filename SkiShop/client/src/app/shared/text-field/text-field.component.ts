@@ -5,9 +5,10 @@ import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'app-text-field',
+  standalone: true,
   imports: [MatFormField, MatLabel, MatInput, MatError, ReactiveFormsModule],
   templateUrl: './text-field.component.html',
-  styleUrl: './text-field.component.scss',
+  styleUrl: './text-field.component.scss'
 })
 export class TextFieldComponent {
   control = input.required<FormControl>();

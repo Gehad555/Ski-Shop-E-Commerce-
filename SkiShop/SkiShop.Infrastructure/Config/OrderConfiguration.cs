@@ -11,6 +11,7 @@ namespace SkiShop.Infrastructure.Config
         {
             builder.OwnsOne(x => x.ShippingAddress, o => o.WithOwner());
             builder.OwnsOne(x => x.PaymentSummary, o => o.WithOwner());
+            builder.HasIndex(x => x.PaymentIntentId).IsUnique();
             builder.Property(x => x.Status).HasConversion(
                 o => o.ToString(),
                 o => Enum.Parse<OrderStatus>(o)

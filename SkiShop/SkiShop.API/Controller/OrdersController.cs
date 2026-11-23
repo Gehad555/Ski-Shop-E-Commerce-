@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Core.Interfaces;
+using Core.Specifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkiShop.API.DTOs;
 using SkiShop.API.Extensions;
-using SkiShop.Core.Entities;
 using SkiShop.Core.Entities.OrderAggregate;
 using SkiShop.Core.Interfaces;
 using SkiShop.Core.Specifications;
@@ -11,66 +12,20 @@ using System;
 namespace API.Controllers;
 
 [Authorize]
-public class OrdersController(ICartService cartService, IUnitOfWork unit) : BaseApiController
+public class OrdersController(IOrderService orderService, IUnitOfWork unit) : BaseApiController
 {
     [HttpPost]
     public async Task<ActionResult<Order>> CreateOrder(CreateOrderDto orderDto)
     {
         var email = User.GetEmail();
 
-        var cart = await cartService.GetCartAsync(orderDto.CartId);
+        var order = await orderService.CreateOrderFromCart(orderDto.CartId,
+            orderDto.ShippingAddress, orderDto.PaymentSummary, email);
 
-        if (cart == null) return BadRequest("Cart not found");
+        if (order == null)
+            return BadRequest("Problem creating order - your card has been charged. Contact customer service");
 
-        if (cart.PaymentIntentId == null) return BadRequest("No payment intent for this order");
-
-        var items = new List<OrderItem>();
-
-        foreach (var item in cart.Items)
-        {
-            var productItem = await unit.Repository<Product>().GetByIdAsync(item.ProductId);
-
-            if (productItem == null) return BadRequest("Problem with the order");
-
-            var itemOrdered = new ProductItemOrdered
-            {
-                ProductId = item.ProductId,
-                ProductName = productItem.Name,
-                PictureUrl = productItem.PictureUrl
-            };
-
-            var orderItem = new OrderItem
-            {
-                ItemOrdered = itemOrdered,
-                Price = productItem.Price,
-                Quantity = item.Quantity
-            };
-            items.Add(orderItem);
-        }
-
-        var deliveryMethod = await unit.Repository<DeliveryMethod>().GetByIdAsync(orderDto.DeliveryMethodId);
-
-        if (deliveryMethod == null) return BadRequest("No delivery method selected");
-
-        var order = new Order
-        {
-            OrderItems = items,
-            DeliveryMethod = deliveryMethod,
-            ShippingAddress = orderDto.ShippingAddress,
-            Subtotal = items.Sum(x => x.Price * x.Quantity),
-            PaymentSummary = orderDto.PaymentSummary,
-            PaymentIntentId = cart.PaymentIntentId,
-            BuyerEmail = email
-        };
-
-        unit.Repository<Order>().Add(order);
-
-        if (await unit.Complete())
-        {
-            return order;
-        }
-
-        return BadRequest("Problem creating order - your card has been charged.  Please contact customer services");
+        return order;
     }
 
     [HttpGet]
