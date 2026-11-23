@@ -3,39 +3,45 @@ import { MatBadge } from '@angular/material/badge';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressBar } from '@angular/material/progress-bar';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
-import { BusyService } from '../../core/services/busy.service';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import {BusyService } from '../../core/services/busy.service';
+import {AccountService} from '../../core/services/account.service';
 import CartService from '../../core/services/cart.service';
-import { AccountService } from '../../core/services/account.service';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatDivider } from '@angular/material/divider';
+
 
 @Component({
   selector: 'app-header',
   imports: [
-    MatIcon,
+     MatIcon,
     MatButton,
     MatBadge,
-    MatProgressBar,
     RouterLink,
     RouterLinkActive,
-    MatMenu,
+    MatProgressBar,
+     MatMenu,
     MatMenuItem,
-    MatMenuTrigger,
-    MatDivider
+    MatDivider,
+    MatMenuTrigger
   ],
+
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent {
-  busyService = inject(BusyService);
-  protected cartService = inject(CartService);
-  accountService = inject(AccountService);
-  private router = inject(Router);
+ busyService = inject(BusyService)
+ cartService = inject(CartService)
+ accountService = inject(AccountService)
+ private router = inject(Router);
+
 
   logout() {
     this.accountService.logout().subscribe({
-      next: () => void this.router.navigateByUrl('/'),
-    });
+      next: () => {
+        this.accountService.userResource.set(undefined);
+        void this.router.navigateByUrl('/');
+      }
+    })
   }
 }

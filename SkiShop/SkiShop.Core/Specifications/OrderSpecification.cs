@@ -22,6 +22,11 @@ namespace SkiShop.Core.Specifications
             AddInclude("DeliveryMethod");
         }
 
+        public OrderSpecification(string paymentIntentId, bool isPaymentIntent) : base(x => x.PaymentIntentId == paymentIntentId)
+        {
+            AddInclude(x => x.DeliveryMethod);
+            AddInclude(x => x.OrderItems);
+        }
 
     }
 }

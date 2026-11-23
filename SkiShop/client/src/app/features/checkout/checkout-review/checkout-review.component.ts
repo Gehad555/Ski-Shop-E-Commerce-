@@ -4,14 +4,12 @@ import { StripeService } from '../../../core/services/stripe.service';
 import CartService from '../../../core/services/cart.service';
 
 @Component({
-  selector: 'app-checkout-review',
   imports: [CurrencyPipe],
-  templateUrl: './checkout-review.component.html',
+  selector: 'app-checkout-review',
   styleUrl: './checkout-review.component.scss',
+  templateUrl: './checkout-review.component.html',
 })
-export class CheckoutReviewComponent {
-  protected stripeService = inject(StripeService);
+export class CheckoutReview {
   protected cartService = inject(CartService);
+  protected stripeService = inject(StripeService);
 }
-
-export { CheckoutReviewComponent as CheckoutReview };

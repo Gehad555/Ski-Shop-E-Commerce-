@@ -6,12 +6,15 @@ import { TestErrorComponent } from './features/test-error/test-error.component';
 import { ServerErrorComponent } from './shared/components/server-error/server-error.component';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { CartComponent } from './features/cart/cart.component';
-import { CheckoutComponent } from './features/checkout/checkout.component';
+import { Checkout } from './features/checkout/checkout.component';
 import { LoginComponent } from './features/account/login/login.component';
 import { RegisterComponent } from './features/account/register/register.component';
 import { authGuard } from './core/guards/auth-guard';
 import { emptyCartGuard } from './core/guards/empty-cart-guard';
 import { paymentIntentResolver } from './core/resolvers/payment-intent-resolver';
+import { Orders } from './features/orders/orders/orders.component';
+import { OrderDetailed } from './features/orders/order-detailed/order-detailed.component';
+
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -19,12 +22,12 @@ export const routes: Routes = [
   { path: 'shop/:id', component: ProductDetailsComponent },
   { path: 'test-error', component: TestErrorComponent },
   { path: 'cart', component: CartComponent },
-  { 
-    path: 'checkout', 
-    component: CheckoutComponent, 
-    canActivate: [authGuard, emptyCartGuard],
-    resolve: { cart: paymentIntentResolver }
-  },
+  {path: 'checkout', component: Checkout, 
+        canActivate: [authGuard, emptyCartGuard],
+        resolve: {paymentIntent: paymentIntentResolver}
+    },
+     {path: 'orders', component: Orders, canActivate: [authGuard]},
+    {path: 'orders/:id', component: OrderDetailed, canActivate: [authGuard]},
   { path: 'account/login', component: LoginComponent },
   { path: 'account/register', component: RegisterComponent },
   { path: 'server-error', component: ServerErrorComponent },

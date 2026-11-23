@@ -1,12 +1,4 @@
 import {
-  MatRippleModule
-} from "./chunk-IX7D3BQL.js";
-import {
-  MatRipple,
-  _StructuralStylesLoader
-} from "./chunk-3LKMRD7P.js";
-import "./chunk-77E6BX7S.js";
-import {
   CdkScrollableModule,
   OverlayConfig,
   OverlayModule,
@@ -15,17 +7,25 @@ import {
   createFlexibleConnectedPositionStrategy,
   createOverlayRef,
   createRepositionScrollStrategy
-} from "./chunk-5JLEAEFE.js";
+} from "./chunk-Z7U6IOS5.js";
+import "./chunk-ERN3DDHH.js";
 import {
   DomPortalOutlet,
   TemplatePortal
 } from "./chunk-X2RRP5FC.js";
-import "./chunk-ERN3DDHH.js";
+import {
+  MatRippleModule
+} from "./chunk-KLIKA76S.js";
+import {
+  MatRipple,
+  _StructuralStylesLoader
+} from "./chunk-VNZ2VSMN.js";
+import "./chunk-77E6BX7S.js";
 import "./chunk-F4DRVYYT.js";
 import "./chunk-6ZX4U7PU.js";
 import {
   _animationsDisabled
-} from "./chunk-ZFO37H2S.js";
+} from "./chunk-A7LB4HF5.js";
 import {
   DOWN_ARROW,
   Directionality,
@@ -45,9 +45,9 @@ import {
   hasModifierKey,
   isFakeMousedownFromScreenReader,
   isFakeTouchstartFromScreenReader
-} from "./chunk-FM3VRLRH.js";
-import "./chunk-2FM4S2IM.js";
-import "./chunk-B36HNU2V.js";
+} from "./chunk-LCLPQ6XM.js";
+import "./chunk-H7N7RT5E.js";
+import "./chunk-B2DQDZD5.js";
 import {
   ApplicationRef,
   ChangeDetectionStrategy,

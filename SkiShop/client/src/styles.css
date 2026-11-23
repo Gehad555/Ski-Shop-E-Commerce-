@@ -2,21 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Fix conflict between Tailwind Preflight and Angular Material outline notch */
-.mat-mdc-form-field .mdc-notched-outline__notch {
-  border-right-style: hidden !important;
-}
-
 .container {
   @apply mx-auto max-w-screen-2xl;
 }
 
 .match-input-height {
-  height: 56px !important;
+  height: var(--mat-form-field-container-height, 56px) !important;
 }
 
-/* Fix Tailwind base interference with Angular Material form fields */
+.mdc-notched-outline__notch {
+  border-right-style: none !important;
+}
+
+/* Fix conflict between Tailwind Preflight and Angular Material outline notch */
 .mat-mdc-form-field .mdc-notched-outline__notch {
+  border-right-style: hidden !important;
   padding-right: 14px !important;
 }
 
@@ -29,5 +29,11 @@ input[matInput] {
   background: transparent !important;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

@@ -20,22 +20,26 @@
             </dl>
         </div>
 
-        <div class="flex flex-col gap-2">   
-            <button mat-flat-button routerLink="/checkout">Checkout</button>
+        @if (location.path() !== '/checkout') {
+        <div class="flex flex-col gap-2">
+            <button [disabled]="loading()" mat-flat-button (click)="onCheckout()">
+                {{loading() ? 'Checkout loading...' : 'Checkout'}}
+            </button>
             <button mat-button routerLink="/shop">Continue shopping</button>
         </div>
+        }
 
     </div>
 
-    <div class="rounded-lg border border-gray-300 bg-(--mat-sys-surface) p-4 shadow-sm">
-        <form class="space-y-3 flex flex-col">
-            <label class="block text-sm font-medium text-gray-700">Do you have a voucher code?</label>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
-                <mat-label>Voucher code&nbsp;&nbsp;</mat-label>
+    <div class="space-y-4 rounded-lg border border-gray-300 bg-(--mat-sys-surface) shadow-sm">
+        <form class="space-y-2 flex flex-col p-2">
+            <label class="mb-2 block text-sm">Do you have a voucher code?</label>
+            <mat-form-field appearance="outline">
+                <mat-label>Voucher code</mat-label>
                 <input type="text" matInput>
             </mat-form-field>
 
-            <button mat-flat-button type="button" class="w-full">Apply code</button>
+            <button mat-flat-button>Apply code</button>
         </form>
     </div>
 
