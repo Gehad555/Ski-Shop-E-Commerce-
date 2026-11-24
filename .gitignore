@@ -58,3 +58,9 @@ TestResults/
 # ===== Publish profiles =====
 **/Properties/PublishProfiles/
 PublishScripts/
+
+# ===== Frontend / Angular =====
+**/node_modules/
+**/dist/
+**/.angular/
+
