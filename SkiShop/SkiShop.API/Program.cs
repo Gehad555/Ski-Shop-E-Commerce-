@@ -11,24 +11,24 @@ using StackExchange.Redis;
 var builder = WebApplication.CreateBuilder(args);
 
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-Console.WriteLine($"CONNECTION STRING = {connectionString}");
-
 builder.Services.AddDbContext<StoreContext>(options =>
-    options.UseSqlServer(connectionString));
-
-
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<AppUser>()
     .AddEntityFrameworkStores<StoreContext>();
 
+builder.Services.ConfigureApplicationCookie(o =>
+{
+    o.Cookie.SameSite = SameSiteMode.None;
+    o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 {
     var connString = builder.Configuration.GetConnectionString("Redis")
         ?? throw new Exception("Cannot get redis connection string");
-    var configuration = ConfigurationOptions.Parse(connString, true);
+    var configuration = ParseRedisConnectionString(connString);
     return ConnectionMultiplexer.Connect(configuration);
 });
 
@@ -66,11 +66,13 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseStaticFiles();
 
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+
 app.UseCors(x => x
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()
-    .WithOrigins("http://localhost:4200", "https://localhost:4200"));
+    .WithOrigins(corsOrigins));
 
 
 app.UseHttpsRedirection();
@@ -96,3 +98,35 @@ catch (Exception ex)
 }
 
 app.Run();
+
+static ConfigurationOptions ParseRedisConnectionString(string connString)
+{
+    if (!connString.StartsWith("redis://") && !connString.StartsWith("rediss://"))
+    {
+        return ConfigurationOptions.Parse(connString, true);
+    }
+
+    var uri = new Uri(connString);
+    var options = new ConfigurationOptions
+    {
+        EndPoints = { { uri.Host, uri.Port } },
+        AbortOnConnectFail = false,
+        Ssl = uri.Scheme == "rediss"
+    };
+
+    if (!string.IsNullOrEmpty(uri.UserInfo))
+    {
+        var parts = uri.UserInfo.Split(':', 2);
+        if (parts.Length == 2)
+        {
+            if (!string.IsNullOrEmpty(parts[0])) options.User = parts[0];
+            options.Password = parts[1];
+        }
+        else if (!string.IsNullOrEmpty(parts[0]))
+        {
+            options.Password = parts[0];
+        }
+    }
+
+    return options;
+}

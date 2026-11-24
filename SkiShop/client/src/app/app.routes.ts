@@ -1,36 +1,58 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
-import { ShopComponent } from './features/shop/shop.component';
-import { ProductDetailsComponent } from './features/product-details/product-details.component';
-import { TestErrorComponent } from './features/test-error/test-error.component';
-import { ServerErrorComponent } from './shared/components/server-error/server-error.component';
-import { NotFoundComponent } from './shared/components/not-found/not-found.component';
-import { CartComponent } from './features/cart/cart.component';
-import { Checkout } from './features/checkout/checkout.component';
-import { LoginComponent } from './features/account/login/login.component';
-import { RegisterComponent } from './features/account/register/register.component';
 import { authGuard } from './core/guards/auth-guard';
 import { emptyCartGuard } from './core/guards/empty-cart-guard';
 import { paymentIntentResolver } from './core/resolvers/payment-intent-resolver';
-import { Orders } from './features/orders/orders/orders.component';
-import { OrderDetailed } from './features/orders/order-detailed/order-detailed.component';
-
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'shop', component: ShopComponent },
-  { path: 'shop/:id', component: ProductDetailsComponent },
-  { path: 'test-error', component: TestErrorComponent },
-  { path: 'cart', component: CartComponent },
-  {path: 'checkout', component: Checkout, 
-        canActivate: [authGuard, emptyCartGuard],
-        resolve: {paymentIntent: paymentIntentResolver}
-    },
-     {path: 'orders', component: Orders, canActivate: [authGuard]},
-    {path: 'orders/:id', component: OrderDetailed, canActivate: [authGuard]},
-  { path: 'account/login', component: LoginComponent },
-  { path: 'account/register', component: RegisterComponent },
-  { path: 'server-error', component: ServerErrorComponent },
-  { path: 'not-found', component: NotFoundComponent },
+  {
+    path: 'shop',
+    loadComponent: () => import('./features/shop/shop.component').then(m => m.ShopComponent)
+  },
+  {
+    path: 'shop/:id',
+    loadComponent: () => import('./features/product-details/product-details.component').then(m => m.ProductDetailsComponent)
+  },
+  {
+    path: 'cart',
+    loadComponent: () => import('./features/cart/cart.component').then(m => m.CartComponent)
+  },
+  {
+    path: 'checkout',
+    loadComponent: () => import('./features/checkout/checkout.component').then(m => m.Checkout),
+    canActivate: [authGuard, emptyCartGuard],
+    resolve: { paymentIntent: paymentIntentResolver }
+  },
+  {
+    path: 'orders',
+    loadComponent: () => import('./features/orders/orders/orders.component').then(m => m.Orders),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'orders/:id',
+    loadComponent: () => import('./features/orders/order-detailed/order-detailed.component').then(m => m.OrderDetailed),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'account/login',
+    loadComponent: () => import('./features/account/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'account/register',
+    loadComponent: () => import('./features/account/register/register.component').then(m => m.RegisterComponent)
+  },
+  {
+    path: 'test-error',
+    loadComponent: () => import('./features/test-error/test-error.component').then(m => m.TestErrorComponent)
+  },
+  {
+    path: 'server-error',
+    loadComponent: () => import('./shared/components/server-error/server-error.component').then(m => m.ServerErrorComponent)
+  },
+  {
+    path: 'not-found',
+    loadComponent: () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent)
+  },
   { path: '**', redirectTo: 'not-found', pathMatch: 'full' }
 ];
