@@ -12,6 +12,7 @@ namespace SkiShop.Core.Specifications
         public BrandListSpecification() : base()
         {
             AddSelect(p => p.Brand);
+            ApplyDistinct();
         }
     }
 }

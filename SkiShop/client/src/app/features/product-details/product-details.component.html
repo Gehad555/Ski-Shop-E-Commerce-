@@ -7,7 +7,7 @@
       <div class="max-w-xl mx-auto">
         <img
           class="w-full"
-          [src]="'/' + product.pictureUrl"
+          [src]="product.pictureUrl"
           (error)="$any($event.target).src = '/images/placeholder.png'"
           alt="{{product.name}}"
         />

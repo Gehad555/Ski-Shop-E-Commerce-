@@ -12,6 +12,7 @@ namespace SkiShop.Core.Specifications
         public TypeListSpecification() : base()
         {
             AddSelect(p => p.Type);
+            ApplyDistinct();
         }
 
     }
