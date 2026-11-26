@@ -2,6 +2,7 @@
 using Core.Specifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SkiShop.API.RequestHelpers;
 using SkiShop.Core.Entities;
 using SkiShop.Core.Interfaces;
 using SkiShop.Core.Specifications;
@@ -12,6 +13,7 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class ProductsController(IUnitOfWork unit) : BaseApiController
 {
+    [Cache(600)]
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery] ProductSpecParams productParams)
     {
@@ -21,6 +23,7 @@ public class ProductsController(IUnitOfWork unit) : BaseApiController
     }
 
 
+    [Cache(600)]
     [HttpGet("{id}")]
     public async Task<ActionResult<Product>> GetProduct(int id)
     {
@@ -31,6 +34,7 @@ public class ProductsController(IUnitOfWork unit) : BaseApiController
         return product;
     }
 
+    [InvalidateCache("api/products|")]
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<Product>> CreateProduct(Product product)
@@ -46,6 +50,7 @@ public class ProductsController(IUnitOfWork unit) : BaseApiController
         return BadRequest("Problem creating product");
     }
 
+    [InvalidateCache("api/products|")]
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProduct(int id, Product product)
@@ -63,6 +68,7 @@ public class ProductsController(IUnitOfWork unit) : BaseApiController
         return BadRequest("Problem updating the product");
     }
 
+    [InvalidateCache("api/products|")]
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int id)
@@ -82,6 +88,7 @@ public class ProductsController(IUnitOfWork unit) : BaseApiController
         return BadRequest("Problem deleting the product");
     }
 
+    [Cache(10000)]
     [HttpGet("brands")]
     public async Task<ActionResult<IReadOnlyList<string>>> GetBrands()
     {
@@ -90,6 +97,7 @@ public class ProductsController(IUnitOfWork unit) : BaseApiController
         return Ok(await unit.Repository<Product>().ListAsync(spec));
     }
 
+    [Cache(10000)]
     [HttpGet("types")]
     public async Task<ActionResult<IReadOnlyList<string>>> GetTypes()
     {

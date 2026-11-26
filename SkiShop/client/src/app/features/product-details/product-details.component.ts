@@ -2,7 +2,7 @@ import { Component, computed, inject, input, linkedSignal } from '@angular/core'
 import { environment } from '../../../environments/environment';
 import { httpResource } from '@angular/common/http';
 import { Product } from '../../shared/models/product';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
@@ -21,7 +21,8 @@ import CartService from '../../core/services/cart.service';
     MatLabel,
     MatInput,
     MatDivider,
-    FormsModule
+    FormsModule,
+    NgOptimizedImage
   ],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.scss',
