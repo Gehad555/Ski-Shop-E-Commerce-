@@ -308,6 +308,9 @@ namespace SkiShop.Infrastructure.Migrations
                     b.Property<int>("DeliveryMethodId")
                         .HasColumnType("integer");
 
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp with time zone");
 

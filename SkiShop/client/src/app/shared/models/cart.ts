@@ -1,9 +1,10 @@
 export type CartType = {
-     id: string;
+    id: string;
     items: Item[];
     deliveryMethodId?: number;
     paymentIntentId?: string;
     clientSecret?: string;
+    coupon?: Coupon;
 }
 
 export type Item = {
@@ -16,12 +17,19 @@ export type Item = {
     type: string;
 }
 
-export class  Cart implements CartType 
-{
-      id = crypto.randomUUID();
-      items: Item[] = [];
-     deliveryMethodId?: number;
-     paymentIntentId?: string;
-     clientSecret?: string;
+export class Cart implements CartType {
+    id = crypto.randomUUID();
+    items: Item[] = [];
+    deliveryMethodId?: number;
+    paymentIntentId?: string;
+    clientSecret?: string;
+    coupon?: Coupon;
+}
 
+export type Coupon = {
+    name: string;
+    amountOff?: number;
+    percentOff?: number;
+    promotionCode: string;
+    couponId: string;
 }

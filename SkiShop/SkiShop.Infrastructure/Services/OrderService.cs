@@ -12,7 +12,7 @@ using System;
 
 namespace SkiShop.Infrastructure.Services;
 
-public class OrderService(ICartService cartService, IUnitOfWork unit, IConfiguration config)
+public class OrderService(ICartService cartService, ICouponService couponService, IUnitOfWork unit, IConfiguration config)
     : IOrderService
 {
     public async Task<Order?> CreateOrderFromCart(string cartId,
@@ -67,6 +67,14 @@ public class OrderService(ICartService cartService, IUnitOfWork unit, IConfigura
 
         var expectedAmount = (long)items.Sum(x => x.Quantity * (x.Price * 100))
             + (long)deliveryMethod.Price * 100;
+        long discount = 0;
+
+        if (cart.Coupon != null)
+        {
+            var subtotal = (long)items.Sum(x => x.Quantity * (x.Price * 100));
+            discount = await couponService.CalculateDiscountFromSubtotal(cart.Coupon, subtotal);
+            expectedAmount = subtotal - discount + (long)(deliveryMethod.Price * 100);
+        }
 
         if (expectedAmount != paidAmountInCents) return null;
 
@@ -75,6 +83,7 @@ public class OrderService(ICartService cartService, IUnitOfWork unit, IConfigura
             OrderItems = items,
             DeliveryMethod = deliveryMethod,
             ShippingAddress = shippingAddress,
+            Discount = discount / 100m,
             Subtotal = items.Sum(x => x.Price * x.Quantity),
             PaymentSummary = paymentSummary,
             PaymentIntentId = cart.PaymentIntentId,
