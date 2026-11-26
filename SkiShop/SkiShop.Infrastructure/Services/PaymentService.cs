@@ -59,6 +59,21 @@ public class PaymentService(IConfiguration config, ICartService cartService,
         return cart;
     }
 
+    public async Task<string> RefundPayment(string paymentIntentId)
+    {
+        StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
+
+        var refundOptions = new RefundCreateOptions
+        {
+            PaymentIntent = paymentIntentId
+        };
+
+        var refundService = new RefundService();
+        var result = await refundService.CreateAsync(refundOptions);
+
+        return result.Status;
+    }
+
     private async Task ValidateCartItemsInCartAsync(AppShoppingCart cart)
     {
         foreach (var item in cart.Items)
