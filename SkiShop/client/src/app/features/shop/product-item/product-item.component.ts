@@ -1,4 +1,4 @@
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardActions, MatCardContent } from '@angular/material/card';
@@ -14,11 +14,11 @@ import CartService from '../../../core/services/cart.service';
     MatCard,
     MatCardContent,
     MatCardActions,
-    MatCardActions,
     MatIcon,
     CurrencyPipe,
     MatButton,
-    RouterLink
+    RouterLink,
+    NgOptimizedImage
 ],
   templateUrl: './product-item.component.html',
   styleUrl: './product-item.component.scss',
