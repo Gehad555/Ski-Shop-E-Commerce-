@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Pagination } from '../../shared/models/pagination';
 import { Product } from '../../shared/models/product';
@@ -14,8 +14,8 @@ export class ShopService {
 
   private http = inject(HttpClient);
 
-  types: string[] = [];
-  brands: string[] = [];
+  types = signal<string[]>([]);
+  brands = signal<string[]>([]);
 
   getproducts(ShopParams: ShopParams) {
      
@@ -43,9 +43,9 @@ export class ShopService {
   }
 
   getBrands() {
-    if(this.brands.length > 0) return ;
+    if (this.brands().length > 0) return;
     return this.http.get<string[]>(this.baseUrl + 'products/brands').subscribe({
-      next: response => this.brands = response,
+      next: response => this.brands.set(response),
     })
   }
 
@@ -54,9 +54,9 @@ getProductsById(id: number) {
     return this.http.get<Product>(this.baseUrl + 'products/' + id);
   }
   getTypes() {
-    if(this.types.length > 0) return ;
+    if (this.types().length > 0) return;
     return this.http.get<string[]>(this.baseUrl + 'products/types').subscribe({
-      next: response => this.types = response,
+      next: response => this.types.set(response),
     })
   }
 

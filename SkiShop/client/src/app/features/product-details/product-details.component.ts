@@ -8,7 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatDivider } from '@angular/material/divider';
-import { FormsModule } from '@angular/forms';
+import { form, min, FormField } from '@angular/forms/signals';
 import CartService from '../../core/services/cart.service';
 
 @Component({
@@ -21,7 +21,7 @@ import CartService from '../../core/services/cart.service';
     MatLabel,
     MatInput,
     MatDivider,
-    FormsModule,
+    FormField,
     NgOptimizedImage
   ],
   templateUrl: './product-details.component.html',
@@ -47,6 +47,9 @@ export class ProductDetailsComponent {
   });
 
   quantity = linkedSignal(() => this.quantityInCart() || 1);
+  quantityField = form(this.quantity, p => {
+    min(p, 0);
+  });
 
   getButtonText() {
     return this.quantityInCart() > 0 ? 'Update cart' : 'Add to cart';

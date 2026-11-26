@@ -1,11 +1,11 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 
 import { CurrencyPipe, Location } from '@angular/common';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { disabled, form, FormField } from '@angular/forms/signals';
 import { MatIcon } from '@angular/material/icon';
 import CartService from '../../../core/services/cart.service';
 import { StripeService } from '../../../core/services/stripe.service';
@@ -20,7 +20,7 @@ import { StripeService } from '../../../core/services/stripe.service';
     MatLabel,
     MatInput,
     MatIcon,
-    ReactiveFormsModule
+    FormField
   ],
   selector: 'app-order-summary',
   styleUrl: './order-summary.component.scss',
@@ -34,18 +34,13 @@ export class OrderSummaryComponent {
   loading = signal(false);
   couponPending = signal(false);
 
-  protected codeControl = new FormControl('', { nonNullable: true });
+  private couponModel = signal({
+    code: this.cartService.cartResource.value()?.coupon?.name ?? ''
+  });
 
-  constructor() {
-    effect(() => {
-      const coupon = this.cartService.cartResource.value()?.coupon;
-      if (coupon) {
-        this.codeControl.disable();
-      } else {
-        this.codeControl.enable();
-      }
-    });
-  }
+  protected couponForm = form(this.couponModel, path => {
+    disabled(path.code, () => !!this.cartService.cartResource.value()?.coupon);
+  });
 
   async onCheckout() {
     this.loading.set(true);
@@ -53,8 +48,9 @@ export class OrderSummaryComponent {
     this.loading.set(false);
   }
 
-  async applyCouponCode() {
-    const code = this.codeControl.value.trim();
+  async applyCouponCode(event: Event) {
+    event.preventDefault();
+    const code = this.couponModel().code.trim();
     if (!code) return;
     this.couponPending.set(true);
     try {
@@ -63,13 +59,13 @@ export class OrderSummaryComponent {
       if (cart) {
         cart.coupon = coupon;
         await this.cartService.setCart(cart);
-        this.codeControl.setValue('');
+        this.couponModel.set({ code: '' });
         if (this.location.path() === '/checkout') {
           await this.stripeService.createOrUpdatePaymentIntent();
         }
       }
     } catch (error) {
-      this.codeControl.setValue('');
+      this.couponModel.set({ code: '' });
     } finally {
       this.couponPending.set(false);
     }

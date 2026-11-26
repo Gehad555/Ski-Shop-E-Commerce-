@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatCard } from '@angular/material/card';
-import { Route,  Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-server-error',
@@ -11,14 +11,11 @@ import { Route,  Router } from '@angular/router';
   styleUrl: './server-error.component.scss',
 })
 export class ServerErrorComponent {
+  private router = inject(Router);
+  error?: any;
 
-error?: any;
-
-constructor( private router :Router) {
-  
-  const navigation = this.router.getCurrentNavigation();
-
-  this.error = navigation?.extras?.state?.['error'];
-
-}
+  constructor() {
+    const navigation = this.router.currentNavigation();
+    this.error = navigation?.extras?.state?.['error'];
+  }
 }

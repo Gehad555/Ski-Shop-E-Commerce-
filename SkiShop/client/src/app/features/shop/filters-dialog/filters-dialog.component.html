@@ -10,7 +10,7 @@
       </h4>
       <mat-divider></mat-divider>
       <mat-selection-list [(ngModel)]="selectedBrands" [multiple]="true" class="!mt-2">
-        @for (brand of shopService.brands; track brand) {
+        @for (brand of shopService.brands(); track brand) {
           <mat-list-option [value]="brand" class="!rounded-lg !mb-1">{{brand}}</mat-list-option>
         }
       </mat-selection-list>
@@ -22,7 +22,7 @@
       </h4>
       <mat-divider></mat-divider>
       <mat-selection-list [(ngModel)]="selectedTypes" [multiple]="true" class="!mt-2">
-        @for (type of shopService.types; track type) {
+        @for (type of shopService.types(); track type) {
           <mat-list-option [value]="type" class="!rounded-lg !mb-1">{{type}}</mat-list-option>
         }
       </mat-selection-list>

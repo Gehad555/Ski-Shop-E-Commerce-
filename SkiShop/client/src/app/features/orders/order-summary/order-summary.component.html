@@ -32,7 +32,7 @@
     </div>
 
     <div class="space-y-4 rounded-lg border border-gray-300 bg-(--mat-sys-surface) shadow-sm">
-        <form (ngSubmit)="applyCouponCode()" class="space-y-2 flex flex-col p-2">
+        <form (submit)="applyCouponCode($event)" class="space-y-2 flex flex-col p-2">
             <label class="mb-2 block text-sm">Do you have a voucher code?</label>
             @if (cartService.cartResource.value()?.coupon; as coupon) {
             <div class="flex justify-between items-center">
@@ -44,7 +44,7 @@
             }
             <mat-form-field appearance="outline">
                 <mat-label>Voucher code</mat-label>
-                <input [formControl]="codeControl" type="text" matInput>
+                <input [formField]="couponForm.code" type="text" matInput>
             </mat-form-field>
 
             <button [disabled]="!!cartService.cartResource.value()?.coupon || couponPending()" type="submit"

@@ -1,5 +1,5 @@
 import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardActions, MatCardContent } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
@@ -25,7 +25,7 @@ import CartService from '../../../core/services/cart.service';
 })
 export class ProductItemComponent {
 
- @Input() product?: Product;
-   protected cartService = inject(CartService);
+  product = input<Product>();
+  protected cartService = inject(CartService);
 
 }

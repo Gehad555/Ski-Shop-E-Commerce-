@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ShopService } from '../../core/services/shop.service';
 import { Product } from '../../shared/models/product';
 import { ProductItemComponent } from "./product-item/product-item.component";
@@ -33,7 +33,7 @@ import { FormsModule } from '@angular/forms';
 export class ShopComponent implements OnInit {
   private shopService = inject(ShopService);
   private dialogService = inject(MatDialog)
-  products?: Pagination<Product>;
+  products = signal<Pagination<Product> | undefined>(undefined);
   sortOptions = [
     { name: 'Alphabetical', value: 'name' },
     { name: 'Price: Low-High', value: 'priceAsc' },
@@ -55,15 +55,12 @@ export class ShopComponent implements OnInit {
 
   onSearchChange() {
     this.shopParams.pageNumber = 1;
-    this.shopService.getproducts(this.shopParams).subscribe({
-      next: response => this.products = response,
-      error: error => console.error(error)
-    })
+    this.getProducts();
   }
 
   getProducts() {
     this.shopService.getproducts(this.shopParams).subscribe({
-      next: response => this.products = response,
+      next: response => this.products.set(response),
       error: error => console.error(error)
     })
   }

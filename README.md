@@ -2,11 +2,11 @@
 
 # ⛷️ SkiShop — Full-Stack E-Commerce Platform
 
-A modern, full-stack winter sports e-commerce application built with **ASP.NET Core 8**, **Angular 20**, **PostgreSQL**, **Redis**, and **Stripe**.
+A modern, full-stack winter sports e-commerce application built with **ASP.NET Core 9**, **Angular 21 (Zoneless)**, **PostgreSQL**, **Redis**, and **Stripe**.
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://ski-shop-e-commerce-e8td.vercel.app/)
-[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
-[![Angular 20](https://img.shields.io/badge/Angular-20-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
+[![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![Angular 21](https://img.shields.io/badge/Angular-21_Zoneless-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-Cache_%26_Cart-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Stripe](https://img.shields.io/badge/Stripe-Payments_%26_Webhooks-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://stripe.com/)
@@ -29,8 +29,8 @@ A modern, full-stack winter sports e-commerce application built with **ASP.NET C
 
 ```mermaid
 flowchart LR
-    Client["Angular 20 SPA<br/>(Vercel)"] -->|HTTPS + Cookie Auth| API["ASP.NET Core 8 Web API<br/>(Docker Container)"]
-    API -->|EF Core 8| PG[("PostgreSQL 17<br/>Products, Orders, Users")]
+    Client["Angular 21 Zoneless SPA<br/>(Vercel)"] -->|HTTPS + Cookie Auth| API["ASP.NET Core 9 Web API<br/>(Docker Container)"]
+    API -->|EF Core 9| PG[("PostgreSQL 17<br/>Products, Orders, Users")]
     API -->|DB 0: Cart<br/>DB 1: Response Cache| Redis[("Redis")]
     API -->|PaymentIntents, Coupons, Refunds| Stripe["Stripe API"]
     Stripe -->|charge.succeeded Webhook| API
@@ -65,6 +65,7 @@ flowchart LR
 - **Product CRUD**: Protected product creation, update, and deletion endpoints with automatic cache invalidation.
 
 ### ⚡ Performance & Caching
+- **Zoneless Change Detection & Signal Forms**: Angular 21 runs without `zone.js`, using Signals, `httpResource`, and `@angular/forms/signals` for fine-grained reactivity and smaller bundles.
 - **Redis Response Caching**: `[Cache(ttl)]` action filter caches GET responses in Redis (`DB 1`) keyed by request path and sorted query parameters.
 - **Automatic Cache Invalidation**: `[InvalidateCache("api/products|")]` automatically clears stale cached product responses after successful admin create/update/delete operations.
 
@@ -74,8 +75,8 @@ flowchart LR
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Backend** | C#, .NET 8, ASP.NET Core Web API, Entity Framework Core 8, ASP.NET Core Identity, Swashbuckle (Swagger) |
-| **Frontend** | Angular 20, TypeScript 5.9, Angular Material 20, Tailwind CSS 3.4, RxJS, Angular Signals & `httpResource` |
+| **Backend** | C#, .NET 9, ASP.NET Core Web API, Entity Framework Core 9, ASP.NET Core Identity, Swashbuckle (Swagger) |
+| **Frontend** | Angular 21 (Zoneless), TypeScript 5.9, Angular Material 21, Tailwind CSS 3.4, RxJS, Angular Signals, `httpResource` & Signal Forms |
 | **Databases & Caching** | PostgreSQL 17 (`Npgsql`), Redis (`StackExchange.Redis`) |
 | **Payments** | Stripe (`Stripe.net` + `@stripe/stripe-js` + Stripe Webhooks) |
 | **Deployment & DevOps** | Vercel (Frontend SPA), Docker & Docker Compose, Multi-stage Dockerfile (Backend) |
@@ -143,8 +144,8 @@ Ski-Shop-E-Commerce-/
 ## 🚀 Getting Started (Local Development)
 
 ### Prerequisites
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Node.js (v20+)](https://nodejs.org/) & npm
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [Node.js (v20.19+ / v22.12+ / v24+)](https://nodejs.org/) & npm
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for PostgreSQL 17 & Redis)
 - A [Stripe](https://stripe.com/) account (test API keys for checkout/coupons/refunds)
 
