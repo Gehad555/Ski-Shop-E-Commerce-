@@ -3,6 +3,7 @@ import { HomeComponent } from './features/home/home.component';
 import { authGuard } from './core/guards/auth-guard';
 import { emptyCartGuard } from './core/guards/empty-cart-guard';
 import { paymentIntentResolver } from './core/resolvers/payment-intent-resolver';
+import { adminGuard } from './core/guards/admin-guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -33,6 +34,11 @@ export const routes: Routes = [
     path: 'orders/:id',
     loadComponent: () => import('./features/orders/order-detailed/order-detailed.component').then(m => m.OrderDetailed),
     canActivate: [authGuard]
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin.component').then(m => m.Admin),
+    canActivate: [authGuard, adminGuard]
   },
   {
     path: 'account/login',
