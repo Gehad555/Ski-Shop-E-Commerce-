@@ -1,0 +1,114 @@
+// Purple theme colors matching the app
+$purple-primary: #7d00fa;
+$purple-light: #e8d5f5;
+$purple-dark: #5c00b8;
+
+// Tab styling
+:host ::ng-deep {
+  .mat-mdc-tab-group {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .mat-mdc-tab-header {
+    border-bottom: 3px solid $purple-primary;
+  }
+
+  .mdc-tab--active .mdc-tab__text-label {
+    color: $purple-primary !important;
+    font-weight: 600;
+  }
+
+  .mdc-tab__text-label {
+    color: #555;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+  }
+
+  .mat-mdc-tab-header .mdc-tab-indicator__content--underline {
+    border-color: $purple-primary !important;
+    border-width: 3px;
+  }
+
+  // Table styling
+  .mat-mdc-table {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+
+    .mat-mdc-header-row {
+      background-color: #fafafa;
+
+      .mat-mdc-header-cell {
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+        border-bottom: 2px solid #e0e0e0;
+      }
+    }
+
+    .mat-mdc-row {
+      &:hover {
+        background-color: #f9f5ff;
+      }
+
+      .mat-mdc-cell {
+        color: #444;
+        font-size: 14px;
+      }
+    }
+  }
+
+  // Paginator
+  .mat-mdc-paginator {
+    border-top: 1px solid #e0e0e0;
+    color: #555;
+  }
+
+  // Filter select
+  .mat-mdc-form-field {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: #ccc !important;
+    }
+
+    &.mat-focused {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: $purple-primary !important;
+      }
+
+      .mat-mdc-select-arrow {
+        color: $purple-primary;
+      }
+
+      .mdc-floating-label {
+        color: $purple-primary !important;
+      }
+    }
+  }
+}
+
+// Action buttons
+.text-blue-500 {
+  color: $purple-primary !important;
+
+  &:hover {
+    color: $purple-dark !important;
+  }
+}
+
+.text-red-500 {
+  color: #d32f2f !important;
+
+  &:hover {
+    color: #b71c1c !important;
+  }
+
+  &.disabled\:opacity-50:disabled {
+    opacity: 0.4;
+    color: #999 !important;
+  }
+}

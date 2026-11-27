@@ -128,7 +128,7 @@ export class Checkout {
     try {
       const orderModel = await this.createOrderModel();
       const order = await firstValueFrom(this.orderService.createOrder(orderModel));
-      this.cartService.deleteCart();
+      this.cartService.forgetCart();
       this.snackbar.success('Payment successful');
       this.orderService.ordersResource.reload();
       void this.router.navigateByUrl(`/orders/${order.id}`);

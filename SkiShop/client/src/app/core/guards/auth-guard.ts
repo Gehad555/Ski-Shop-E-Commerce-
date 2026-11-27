@@ -1,5 +1,16 @@
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { AccountService } from '../services/account.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  return true;
+  const accountService = inject(AccountService);
+  const router = inject(Router);
+
+  if (accountService.currentUser()) {
+    return true;
+  }
+
+  return router.createUrlTree(['/account/login'], {
+    queryParams: { returnUrl: state.url }
+  });
 };

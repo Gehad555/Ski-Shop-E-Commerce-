@@ -42,6 +42,7 @@ export class HeaderComponent {
     this.accountService.logout().subscribe({
       next: () => {
         this.accountService.userResource.set(undefined);
+        this.cartService.forgetCart();
         void this.router.navigateByUrl('/');
       }
     })
