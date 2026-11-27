@@ -1,55 +1,22 @@
-import { Component, computed, inject } from '@angular/core';
-import { AdminService } from '../../core/services/admin.service';
-import { Order } from '../../shared/models/order';
-import { PageEvent, MatPaginator } from '@angular/material/paginator';
-import { MatSelectChange, MatSelect } from '@angular/material/select';
-import { MatTabGroup, MatTab } from '@angular/material/tabs';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatOption } from '@angular/material/core';
-import {
-  MatTable,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderCellDef,
-  MatCell,
-  MatCellDef,
-  MatHeaderRow,
-  MatHeaderRowDef,
-  MatRow,
-  MatRowDef
-} from '@angular/material/table';
-import { DatePipe, CurrencyPipe } from '@angular/common';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatIconButton } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { MatTabGroup, MatTab, MatTabLabel, MatTabContent } from '@angular/material/tabs';
 import { MatIcon } from '@angular/material/icon';
-import { DialogService } from '../../core/services/dialog.service';
+import { AdminService } from '../../core/services/admin.service';
+import { AccountService } from '../../core/services/account.service';
+import { AdminOrdersComponent } from './admin-orders/admin-orders.component';
+import { AdminCatalogComponent } from './admin-catalog/admin-catalog.component';
+import { AdminCustomerServiceComponent } from './admin-customer-service/admin-customer-service.component';
 
 @Component({
   imports: [
     MatTabGroup,
     MatTab,
-    MatFormField,
-    MatLabel,
-    MatSelect,
-    MatOption,
-    MatTable,
-    MatColumnDef,
-    MatHeaderCell,
-    MatHeaderCellDef,
-    MatCell,
-    MatCellDef,
-    MatHeaderRow,
-    MatHeaderRowDef,
-    MatRow,
-    MatRowDef,
-    MatPaginator,
-    DatePipe,
-    CurrencyPipe,
-    MatTooltip,
-    MatIconButton,
-    RouterLink,
-    MatIcon
+    MatTabLabel,
+    MatTabContent,
+    MatIcon,
+    AdminOrdersComponent,
+    AdminCatalogComponent,
+    AdminCustomerServiceComponent
   ],
   selector: 'app-admin',
   styleUrl: './admin.component.scss',
@@ -57,46 +24,20 @@ import { DialogService } from '../../core/services/dialog.service';
 })
 export class Admin {
   protected adminService = inject(AdminService);
-  protected displayedColumns: string[] = ['id', 'buyerEmail', 'orderDate', 'total', 'status', 'actions'];
-  protected statusOptions = ['All', 'PaymentReceived', 'Refunded', 'Pending'];
-  private dialogService = inject(DialogService);
+  protected accountService = inject(AccountService);
 
-  protected orders = computed<Order[]>(() => this.adminService.ordersResource.value()?.data ?? []);
-  protected totalItems = computed(() => this.adminService.ordersResource.value()?.count ?? 0);
-  protected pageIndex = computed(() => this.adminService.orderParams().pageNumber - 1);
-  protected pageSize = computed(() => this.adminService.orderParams().pageSize);
+  protected selectedTabIndex = signal(0);
 
-  onPageChange(event: PageEvent) {
-    this.adminService.orderParams.update(current => ({
-      ...current,
-      pageNumber: event.pageIndex + 1,
-      pageSize: event.pageSize
-    }));
-  }
+  protected ordersCount = computed(() => this.adminService.ordersResource.value()?.count);
+  protected productsCount = computed(() => this.adminService.productsResource.value()?.count);
 
-  onFilterSelect(event: MatSelectChange) {
-    this.adminService.orderParams.update(current => ({
-      ...current,
-      pageNumber: 1,
-      status: event.value
-    }));
-  }
-
-  async openConfirmDialog(id: number) {
-    const confirmed = await this.dialogService.confirm(
-      'Confirm refund',
-      'Are you sure you want to issue this refund? This cannot be undone'
-    );
-
-    if (confirmed) this.refundOrder(id);
-  }
-
-  refundOrder(id: number) {
-    this.adminService.refundOrder(id).subscribe({
-      next: () => {
-        this.adminService.ordersResource.reload();
-      }
-    });
+  onTabChange(index: number) {
+    this.selectedTabIndex.set(index);
+    if (index === 1) {
+      this.adminService.catalogActive.set(true);
+    } else if (index === 2) {
+      this.adminService.supportActive.set(true);
+    }
   }
 }
 

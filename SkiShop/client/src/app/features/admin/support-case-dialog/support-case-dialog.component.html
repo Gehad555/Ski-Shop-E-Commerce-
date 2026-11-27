@@ -1,0 +1,168 @@
+<div class="flex items-center justify-between px-6 pt-5 pb-3 border-b border-gray-100">
+    <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <mat-icon>support_agent</mat-icon>
+        </div>
+        <div>
+            <div class="flex items-center gap-2">
+                <h2 mat-dialog-title class="!m-0 !p-0 !text-lg !font-semibold text-gray-900">
+                    Support Case · Order #{{ order().id }}
+                </h2>
+                <span
+                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border"
+                    [ngClass]="{
+                        'bg-emerald-50 text-emerald-700 border-emerald-200': order().status === 'PaymentReceived',
+                        'bg-amber-50 text-amber-700 border-amber-200': order().status === 'Pending',
+                        'bg-red-50 text-red-700 border-red-200': order().status === 'PaymentFailed',
+                        'bg-rose-50 text-rose-700 border-rose-200': order().status === 'Refunded'
+                    }">
+                    {{ order().status | splitCamelCase }}
+                </span>
+            </div>
+            <p class="text-xs text-gray-500 mt-0.5">
+                Placed {{ order().orderDate | date: 'MMM d, y, h:mm a' }} · Total {{ order().total | currency }}
+            </p>
+        </div>
+    </div>
+    <button mat-icon-button (click)="close()" aria-label="Close dialog" class="!text-gray-400 hover:!text-gray-600">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<mat-dialog-content class="!pt-5 !pb-3 space-y-5">
+    <!-- Customer & Payment Summary Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 space-y-2">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Customer & Shipping</p>
+            <p class="text-sm font-semibold text-gray-900">
+                {{ order().shippingAddress.name || 'Customer' }}
+            </p>
+            <div class="flex items-center gap-1.5 text-sm text-gray-700">
+                <span class="truncate">{{ order().buyerEmail }}</span>
+                <button
+                    mat-icon-button
+                    type="button"
+                    matTooltip="Copy email"
+                    (click)="copyText(order().buyerEmail, 'Email')"
+                    class="!h-7 !w-7 !p-0 !text-gray-500 hover:!text-purple-600">
+                    <mat-icon class="!text-base">content_copy</mat-icon>
+                </button>
+            </div>
+            @if (order().shippingAddress; as addr) {
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    {{ addr.line1 }}@if (addr.line2) {, {{ addr.line2 }}}<br />
+                    {{ addr.city }}, {{ addr.state }} {{ addr.postalCode }}, {{ addr.country }}
+                </p>
+            }
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 space-y-2">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Payment & Stripe Reference</p>
+            @if (order().paymentSummary; as card) {
+                <p class="text-sm font-semibold text-gray-900">
+                    {{ card.brand | uppercase }} •••• {{ card.last4 }}
+                    <span class="text-xs font-normal text-gray-500">({{ card.expMonth }}/{{ card.expYear }})</span>
+                </p>
+            }
+            <p class="text-xs text-gray-600">Delivery: {{ order().deliveryMethod }} ({{ order().shippingPrice | currency }})</p>
+            @if (order().paymentIntentId) {
+                <div class="flex items-center gap-1.5 pt-1">
+                    <code class="text-[11px] bg-white border border-gray-200 rounded px-2 py-0.5 text-gray-600 truncate max-w-[190px]">
+                        {{ order().paymentIntentId }}
+                    </code>
+                    <button
+                        mat-icon-button
+                        type="button"
+                        matTooltip="Copy Stripe PaymentIntent ID"
+                        (click)="copyText(order().paymentIntentId, 'PaymentIntent ID')"
+                        class="!h-7 !w-7 !p-0 !text-gray-500 hover:!text-purple-600">
+                        <mat-icon class="!text-base">content_copy</mat-icon>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Order Items Snapshot -->
+    @if (order().orderItems.length) {
+        <div class="rounded-xl border border-gray-200 overflow-hidden">
+            <div class="bg-gray-50 px-4 py-2 border-b border-gray-200 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Ordered Items ({{ order().orderItems.length }})
+            </div>
+            <div class="divide-y divide-gray-100 max-h-40 overflow-y-auto">
+                @for (item of order().orderItems; track item.productId) {
+                    <div class="flex items-center justify-between px-4 py-2.5 text-sm">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <img [src]="item.pictureUrl" [alt]="item.productName" class="h-9 w-9 rounded border border-gray-200 bg-white object-contain p-0.5 shrink-0" />
+                            <span class="font-medium text-gray-800 truncate">{{ item.productName }}</span>
+                        </div>
+                        <div class="flex items-center gap-4 shrink-0 text-gray-600">
+                            <span>x{{ item.quantity }}</span>
+                            <span class="font-semibold text-gray-900">{{ item.price | currency }}</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Support Status & Internal Notes -->
+    <div class="space-y-3 pt-1">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
+            <mat-label>Support case status</mat-label>
+            <mat-select [value]="caseStatus()" (selectionChange)="caseStatus.set($event.value)">
+                @for (opt of caseStatusOptions; track opt.value) {
+                    <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
+            <mat-label>Internal support notes</mat-label>
+            <textarea
+                matInput
+                rows="3"
+                [ngModel]="note()"
+                (ngModelChange)="note.set($event)"
+                placeholder="Record customer communication, delivery updates, or refund reason..."></textarea>
+        </mat-form-field>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="!px-6 !py-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
+        <a
+            mat-stroked-button
+            [href]="'mailto:' + order().buyerEmail + '?subject=SkiShop Support - Order %23' + order().id"
+            class="!border-gray-300 !text-gray-700">
+            <mat-icon>mail_outline</mat-icon>
+            Email
+        </a>
+        <a
+            mat-stroked-button
+            routerLink="/orders/{{order().id}}"
+            (click)="close()"
+            class="!border-purple-200 !text-purple-700">
+            <mat-icon>visibility</mat-icon>
+            Full order
+        </a>
+        @if (order().status === 'PaymentReceived') {
+            <button
+                mat-stroked-button
+                type="button"
+                (click)="issueRefund()"
+                [disabled]="refunding()"
+                class="!border-red-200 !text-red-600 hover:!bg-red-50">
+                <mat-icon>undo</mat-icon>
+                {{ refunding() ? 'Refunding...' : 'Refund' }}
+            </button>
+        }
+    </div>
+
+    <div class="flex items-center gap-2">
+        <button mat-stroked-button type="button" (click)="close()">Close</button>
+        <button mat-flat-button type="button" (click)="saveCase()" class="!bg-[#7d00fa] !text-white hover:!bg-[#5c00b8]">
+            Save case
+        </button>
+    </div>
+</mat-dialog-actions>

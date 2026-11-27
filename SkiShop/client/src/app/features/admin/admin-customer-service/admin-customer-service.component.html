@@ -1,0 +1,390 @@
+<div class="space-y-6">
+    <!-- Summary KPI Strip -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Active customers</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ uniqueCustomers().length }}</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                <mat-icon>group</mat-icon>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Needs attention</p>
+                <p class="mt-1 text-2xl font-bold text-amber-600">{{ attentionCount() }}</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                <mat-icon>priority_high</mat-icon>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Refunded orders</p>
+                <p class="mt-1 text-2xl font-bold text-rose-600">{{ refundedCount() }}</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
+                <mat-icon>assignment_return</mat-icon>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Resolved cases</p>
+                <p class="mt-1 text-2xl font-bold text-emerald-700">{{ resolvedCount() }}</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <mat-icon>verified</mat-icon>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Desk Card -->
+    <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <!-- Toolbar -->
+        <div class="flex flex-col gap-4 px-6 py-5 border-b border-gray-100 bg-gray-50/60">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900">Customer service & support desk</h2>
+                    <p class="text-sm text-gray-500 mt-0.5">
+                        Assist customers with orders, investigate Stripe payments, record case notes, and process refunds.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- View Mode Switch -->
+                    <div class="inline-flex rounded-lg border border-gray-200 bg-white p-1">
+                        <button
+                            type="button"
+                            (click)="viewMode.set('cases')"
+                            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors"
+                            [ngClass]="viewMode() === 'cases' ? 'bg-[#7d00fa] text-white' : 'text-gray-600 hover:text-gray-900'">
+                            Support cases
+                        </button>
+                        <button
+                            type="button"
+                            (click)="viewMode.set('customers')"
+                            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors"
+                            [ngClass]="viewMode() === 'customers' ? 'bg-[#7d00fa] text-white' : 'text-gray-600 hover:text-gray-900'">
+                            Customers ({{ uniqueCustomers().length }})
+                        </button>
+                    </div>
+
+                    <button
+                        mat-icon-button
+                        matTooltip="Refresh support data"
+                        (click)="reload()"
+                        class="!text-gray-600 hover:!text-purple-600 hover:!bg-purple-50">
+                        <mat-icon>refresh</mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Queue Pills & Search -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                @if (viewMode() === 'cases') {
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button
+                            type="button"
+                            (click)="queueFilter.set('all')"
+                            class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors"
+                            [ngClass]="queueFilter() === 'all' ? 'bg-purple-50 text-purple-700 border-purple-300' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'">
+                            All ({{ orders().length }})
+                        </button>
+                        <button
+                            type="button"
+                            (click)="queueFilter.set('attention')"
+                            class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors"
+                            [ngClass]="queueFilter() === 'attention' ? 'bg-amber-50 text-amber-700 border-amber-300' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'">
+                            Needs attention ({{ attentionCount() }})
+                        </button>
+                        <button
+                            type="button"
+                            (click)="queueFilter.set('refunded')"
+                            class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors"
+                            [ngClass]="queueFilter() === 'refunded' ? 'bg-rose-50 text-rose-700 border-rose-300' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'">
+                            Refunded ({{ refundedCount() }})
+                        </button>
+                        <button
+                            type="button"
+                            (click)="queueFilter.set('resolved')"
+                            class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors"
+                            [ngClass]="queueFilter() === 'resolved' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'">
+                            Resolved ({{ resolvedCount() }})
+                        </button>
+                    </div>
+                } @else {
+                    <p class="text-xs font-medium text-gray-500">
+                        Showing unique buyers aggregated from recent customer orders.
+                    </p>
+                }
+
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full md:w-72 bg-white rounded-md">
+                    <mat-label>Search customer or #Order</mat-label>
+                    <mat-icon matPrefix class="text-gray-400 mr-1">search</mat-icon>
+                    <input
+                        matInput
+                        [ngModel]="searchTerm()"
+                        (ngModelChange)="searchTerm.set($event)"
+                        placeholder="Email, name, city, or #ID" />
+                    @if (searchTerm()) {
+                        <button mat-icon-button matSuffix aria-label="Clear search" (click)="searchTerm.set('')">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    }
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- CASES VIEW -->
+        @if (adminService.supportOrdersResource.isLoading() && orders().length === 0) {
+            <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                <div class="h-10 w-10 rounded-full border-2 border-purple-200 border-t-[#7d00fa] animate-spin mb-3"></div>
+                <p class="text-sm font-medium text-gray-600">Loading customer service data...</p>
+            </div>
+        } @else if (viewMode() === 'cases') {
+            @if (filteredCases().length > 0) {
+                <div class="overflow-x-auto">
+                    <table mat-table [dataSource]="filteredCases()" class="w-full">
+                        <ng-container matColumnDef="no">
+                            <th mat-header-cell *matHeaderCellDef class="w-16">No.</th>
+                            <td mat-cell *matCellDef="let order; let i = index">
+                                <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-gray-100 text-xs font-semibold text-gray-700">
+                                    {{ i + 1 }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="orderId">
+                            <th mat-header-cell *matHeaderCellDef>Order #</th>
+                            <td mat-cell *matCellDef="let order">
+                                <div class="flex flex-col py-1">
+                                    <span class="font-semibold text-purple-700">#{{ order.id }}</span>
+                                    <span class="text-xs text-gray-400">{{ order.orderDate | date: 'MMM d, y' }}</span>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="customer">
+                            <th mat-header-cell *matHeaderCellDef>Customer</th>
+                            <td mat-cell *matCellDef="let order">
+                                <div class="flex flex-col py-1">
+                                    <span class="font-medium text-gray-900">{{ order.shippingAddress?.name || 'Customer' }}</span>
+                                    <span class="text-xs text-gray-500">{{ order.buyerEmail }}</span>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="payment">
+                            <th mat-header-cell *matHeaderCellDef>Payment</th>
+                            <td mat-cell *matCellDef="let order">
+                                @if (order.paymentSummary; as card) {
+                                    <span class="text-xs font-medium text-gray-700">
+                                        {{ card.brand | uppercase }} •••• {{ card.last4 }}
+                                    </span>
+                                } @else {
+                                    <span class="text-xs text-gray-400">—</span>
+                                }
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total">
+                            <th mat-header-cell *matHeaderCellDef>Total</th>
+                            <td mat-cell *matCellDef="let order">
+                                <span class="font-semibold text-gray-900">{{ order.total | currency }}</span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="orderStatus">
+                            <th mat-header-cell *matHeaderCellDef>Order status</th>
+                            <td mat-cell *matCellDef="let order">
+                                <span
+                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border whitespace-nowrap"
+                                    [ngClass]="{
+                                        'bg-emerald-50 text-emerald-700 border-emerald-200': order.status === 'PaymentReceived',
+                                        'bg-amber-50 text-amber-700 border-amber-200': order.status === 'Pending',
+                                        'bg-red-50 text-red-700 border-red-200': order.status === 'PaymentFailed',
+                                        'bg-rose-50 text-rose-700 border-rose-200': order.status === 'Refunded'
+                                    }">
+                                    {{ order.status | splitCamelCase }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="caseStatus">
+                            <th mat-header-cell *matHeaderCellDef>Support case</th>
+                            <td mat-cell *matCellDef="let order">
+                                <button
+                                    type="button"
+                                    (click)="openSupportCase(order)"
+                                    [matTooltip]="hasCaseNote(order) ? getCaseNotePreview(order) : 'Click to manage case & notes'"
+                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold border transition-colors whitespace-nowrap"
+                                    [ngClass]="{
+                                        'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100': getCaseStatus(order) === 'Open',
+                                        'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100': getCaseStatus(order) === 'InProgress',
+                                        'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100': getCaseStatus(order) === 'Resolved'
+                                    }">
+                                    <span>{{ formatCaseStatus(getCaseStatus(order)) }}</span>
+                                    @if (hasCaseNote(order)) {
+                                        <mat-icon class="!text-sm !w-3.5 !h-3.5">sticky_note_2</mat-icon>
+                                    }
+                                </button>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef class="!text-right">Actions</th>
+                            <td mat-cell *matCellDef="let order">
+                                <div class="flex items-center justify-end gap-1">
+                                    <button
+                                        mat-icon-button
+                                        matTooltip="Open case details & notes"
+                                        (click)="openSupportCase(order)"
+                                        class="!text-purple-600 hover:!bg-purple-50">
+                                        <mat-icon>support_agent</mat-icon>
+                                    </button>
+                                    <a
+                                        mat-icon-button
+                                        matTooltip="Email customer"
+                                        [href]="'mailto:' + order.buyerEmail + '?subject=SkiShop Support - Order %23' + order.id"
+                                        class="!text-blue-600 hover:!bg-blue-50">
+                                        <mat-icon>mail_outline</mat-icon>
+                                    </a>
+                                    <button
+                                        mat-icon-button
+                                        [matTooltip]="order.status === 'PaymentReceived' ? 'Quick refund' : 'Only paid orders can be refunded'"
+                                        [disabled]="order.status !== 'PaymentReceived'"
+                                        (click)="quickRefund(order)"
+                                        class="!text-red-600 hover:!bg-red-50 disabled:!text-gray-300 disabled:hover:!bg-transparent">
+                                        <mat-icon>undo</mat-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="caseColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: caseColumns;"></tr>
+                    </table>
+                </div>
+            } @else {
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="h-14 w-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
+                        <mat-icon class="scale-125">support_agent</mat-icon>
+                    </div>
+                    <h3 class="text-base font-semibold text-gray-900">No support cases in this queue</h3>
+                    <p class="text-sm text-gray-500 mt-1 max-w-md">
+                        @if (searchTerm() || queueFilter() !== 'all') {
+                            No cases matched your current search or queue filter.
+                        } @else {
+                            Customer orders and support cases will appear here automatically.
+                        }
+                    </p>
+                    @if (searchTerm() || queueFilter() !== 'all') {
+                        <button mat-stroked-button class="mt-4 !border-purple-600 !text-purple-600" (click)="clearSearch()">
+                            Show all cases
+                        </button>
+                    }
+                </div>
+            }
+        } @else {
+            <!-- CUSTOMERS DIRECTORY VIEW -->
+            @if (filteredCustomers().length > 0) {
+                <div class="overflow-x-auto">
+                    <table mat-table [dataSource]="filteredCustomers()" class="w-full">
+                        <ng-container matColumnDef="no">
+                            <th mat-header-cell *matHeaderCellDef class="w-16">No.</th>
+                            <td mat-cell *matCellDef="let customer; let i = index">
+                                <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-gray-100 text-xs font-semibold text-gray-700">
+                                    {{ i + 1 }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="customer">
+                            <th mat-header-cell *matHeaderCellDef>Customer</th>
+                            <td mat-cell *matCellDef="let customer">
+                                <div class="flex flex-col py-1">
+                                    <span class="font-medium text-gray-900">{{ customer.name }}</span>
+                                    <span class="text-xs text-gray-500">
+                                        {{ customer.email }}
+                                        @if (customer.city) {
+                                            · {{ customer.city }}
+                                        }
+                                    </span>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="ordersCount">
+                            <th mat-header-cell *matHeaderCellDef>Orders</th>
+                            <td mat-cell *matCellDef="let customer">
+                                <span class="font-medium text-gray-800">{{ customer.ordersCount }}</span>
+                                @if (customer.refundedCount > 0) {
+                                    <span class="ml-1.5 text-xs text-rose-600">({{ customer.refundedCount }} refunded)</span>
+                                }
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="totalSpent">
+                            <th mat-header-cell *matHeaderCellDef>Net spend</th>
+                            <td mat-cell *matCellDef="let customer">
+                                <span class="font-semibold text-gray-900">{{ customer.totalSpent | currency }}</span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="lastOrder">
+                            <th mat-header-cell *matHeaderCellDef>Last activity</th>
+                            <td mat-cell *matCellDef="let customer">
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-gray-700">{{ customer.lastOrderDate | date: 'MMM d, y' }}</span>
+                                    <span class="text-xs text-gray-400">{{ customer.lastOrderStatus | splitCamelCase }}</span>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef class="!text-right">Actions</th>
+                            <td mat-cell *matCellDef="let customer">
+                                <div class="flex items-center justify-end gap-1">
+                                    <button
+                                        mat-icon-button
+                                        matTooltip="View customer's cases"
+                                        (click)="inspectCustomerOrders(customer.email)"
+                                        class="!text-purple-600 hover:!bg-purple-50">
+                                        <mat-icon>manage_search</mat-icon>
+                                    </button>
+                                    <a
+                                        mat-icon-button
+                                        matTooltip="Email customer"
+                                        [href]="'mailto:' + customer.email + '?subject=SkiShop Customer Support'"
+                                        class="!text-blue-600 hover:!bg-blue-50">
+                                        <mat-icon>mail_outline</mat-icon>
+                                    </a>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="customerColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: customerColumns;"></tr>
+                    </table>
+                </div>
+            } @else {
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="h-14 w-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
+                        <mat-icon class="scale-125">group</mat-icon>
+                    </div>
+                    <h3 class="text-base font-semibold text-gray-900">No customers found</h3>
+                    <p class="text-sm text-gray-500 mt-1">Try adjusting your search query.</p>
+                </div>
+            }
+        }
+
+        <div class="px-6 py-3 bg-gray-50 border-t border-gray-100 flex items-center gap-2 text-xs text-gray-500">
+            <mat-icon class="!text-base !w-4 !h-4 text-gray-400">info</mat-icon>
+            <span>Orders & refunds sync live with the server; support case statuses and notes are stored in this browser.</span>
+        </div>
+    </div>
+</div>

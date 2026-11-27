@@ -1,0 +1,290 @@
+<div class="space-y-6">
+    <!-- Summary KPI Strip -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Total products</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ totalItems() }}</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                <mat-icon>inventory_2</mat-icon>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Brands & Categories</p>
+                <p class="mt-1 text-lg font-bold text-gray-900">
+                    {{ shopService.brands().length }} <span class="text-sm font-normal text-gray-500">brands</span>
+                    · {{ shopService.types().length }} <span class="text-sm font-normal text-gray-500">types</span>
+                </p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                <mat-icon>category</mat-icon>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Low stock (page)</p>
+                <p class="mt-1 text-2xl font-bold text-amber-600">{{ lowStockCount() }}</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                <mat-icon>warning_amber</mat-icon>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Out of stock (page)</p>
+                <p class="mt-1 text-2xl font-bold text-red-600">{{ outOfStockCount() }}</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-red-50 flex items-center justify-center text-red-600">
+                <mat-icon>remove_shopping_cart</mat-icon>
+            </div>
+        </div>
+    </div>
+
+    <!-- Catalog Card -->
+    <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <!-- Toolbar -->
+        <div class="flex flex-col gap-4 px-6 py-5 border-b border-gray-100 bg-gray-50/60">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900">Product catalog</h2>
+                    <p class="text-sm text-gray-500 mt-0.5">
+                        Create, update, and manage snow sports gear inventory and pricing.
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button
+                        mat-icon-button
+                        matTooltip="Refresh catalog"
+                        (click)="reload()"
+                        class="!text-gray-600 hover:!text-purple-600 hover:!bg-purple-50">
+                        <mat-icon>refresh</mat-icon>
+                    </button>
+                    <button
+                        mat-flat-button
+                        (click)="openCreateDialog()"
+                        class="!bg-[#7d00fa] !text-white hover:!bg-[#5c00b8] !px-4 !py-2 !rounded-lg">
+                        <mat-icon>add</mat-icon>
+                        Add product
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters Row -->
+            <div class="flex flex-wrap items-center gap-3">
+                <form (ngSubmit)="onSearchSubmit()" class="w-full sm:w-64">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full bg-white rounded-md">
+                        <mat-label>Search products</mat-label>
+                        <input
+                            matInput
+                            name="catalogSearch"
+                            [ngModel]="searchInput()"
+                            (ngModelChange)="searchInput.set($event)"
+                            placeholder="Product name..." />
+                        <div matSuffix class="flex items-center">
+                            @if (searchInput()) {
+                                <button mat-icon-button type="button" (click)="clearSearch()" aria-label="Clear search">
+                                    <mat-icon>close</mat-icon>
+                                </button>
+                            }
+                            <button mat-icon-button type="submit" aria-label="Search catalog" class="!text-purple-600">
+                                <mat-icon>search</mat-icon>
+                            </button>
+                        </div>
+                    </mat-form-field>
+                </form>
+
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full sm:w-44 bg-white rounded-md">
+                    <mat-label>Brand</mat-label>
+                    <mat-select [value]="selectedBrand()" (selectionChange)="onBrandChange($event)">
+                        <mat-option value="All">All brands</mat-option>
+                        @for (brand of shopService.brands(); track brand) {
+                            <mat-option [value]="brand">{{ brand }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full sm:w-44 bg-white rounded-md">
+                    <mat-label>Category</mat-label>
+                    <mat-select [value]="selectedType()" (selectionChange)="onTypeChange($event)">
+                        <mat-option value="All">All categories</mat-option>
+                        @for (type of shopService.types(); track type) {
+                            <mat-option [value]="type">{{ type }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full sm:w-48 bg-white rounded-md">
+                    <mat-label>Sort by</mat-label>
+                    <mat-select [value]="selectedSort()" (selectionChange)="onSortChange($event)">
+                        @for (option of sortOptions; track option.value) {
+                            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+                @if (hasActiveFilters()) {
+                    <button mat-stroked-button type="button" (click)="resetFilters()" class="!border-gray-300 !text-gray-700">
+                        <mat-icon>filter_alt_off</mat-icon>
+                        Clear
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Table -->
+        @if (adminService.productsResource.isLoading() && products().length === 0) {
+            <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                <div class="h-10 w-10 rounded-full border-2 border-purple-200 border-t-[#7d00fa] animate-spin mb-3"></div>
+                <p class="text-sm font-medium text-gray-600">Loading product catalog...</p>
+            </div>
+        } @else if (products().length > 0) {
+            <div class="overflow-x-auto">
+                <table mat-table [dataSource]="products()" class="w-full">
+                    <ng-container matColumnDef="no">
+                        <th mat-header-cell *matHeaderCellDef class="w-16">No.</th>
+                        <td mat-cell *matCellDef="let product; let i = index">
+                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-gray-100 text-xs font-semibold text-gray-700">
+                                {{ pageIndex() * pageSize() + i + 1 }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="product">
+                        <th mat-header-cell *matHeaderCellDef>Product</th>
+                        <td mat-cell *matCellDef="let product">
+                            <div class="flex items-center gap-3 py-1.5">
+                                <img
+                                    [src]="product.pictureUrl"
+                                    (error)="onImgError($event)"
+                                    [alt]="product.name"
+                                    class="h-11 w-11 rounded-lg border border-gray-200 bg-gray-50 object-contain p-1 shrink-0" />
+                                <div class="min-w-0">
+                                    <p class="font-medium text-gray-900 line-clamp-1">{{ product.name }}</p>
+                                    <p class="text-xs text-gray-400">ID #{{ product.id }}</p>
+                                </div>
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="brand">
+                        <th mat-header-cell *matHeaderCellDef>Brand</th>
+                        <td mat-cell *matCellDef="let product">
+                            <span class="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                                {{ product.brand }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef>Category</th>
+                        <td mat-cell *matCellDef="let product">
+                            <span class="inline-flex items-center rounded-md bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-700">
+                                {{ product.type }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="price">
+                        <th mat-header-cell *matHeaderCellDef>Price</th>
+                        <td mat-cell *matCellDef="let product">
+                            <span class="font-semibold text-gray-900">{{ product.price | currency }}</span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="stock">
+                        <th mat-header-cell *matHeaderCellDef>Stock</th>
+                        <td mat-cell *matCellDef="let product">
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold border whitespace-nowrap"
+                                [ngClass]="{
+                                    'bg-red-50 text-red-700 border-red-200': product.quantityInStock === 0,
+                                    'bg-amber-50 text-amber-700 border-amber-200': product.quantityInStock > 0 && product.quantityInStock <= 10,
+                                    'bg-emerald-50 text-emerald-700 border-emerald-200': product.quantityInStock > 10
+                                }">
+                                @if (product.quantityInStock === 0) {
+                                    Out of stock
+                                } @else if (product.quantityInStock <= 10) {
+                                    Low ({{ product.quantityInStock }})
+                                } @else {
+                                    {{ product.quantityInStock }} in stock
+                                }
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef class="!text-right">Actions</th>
+                        <td mat-cell *matCellDef="let product">
+                            <div class="flex items-center justify-end gap-1">
+                                <button
+                                    mat-icon-button
+                                    matTooltip="View in shop"
+                                    routerLink="/shop/{{product.id}}"
+                                    class="!text-gray-500 hover:!text-purple-600 hover:!bg-purple-50">
+                                    <mat-icon>open_in_new</mat-icon>
+                                </button>
+                                <button
+                                    mat-icon-button
+                                    matTooltip="Edit product"
+                                    (click)="openEditDialog(product)"
+                                    class="!text-purple-600 hover:!bg-purple-50">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                <button
+                                    mat-icon-button
+                                    matTooltip="Delete product"
+                                    (click)="confirmDelete(product)"
+                                    class="!text-red-600 hover:!bg-red-50">
+                                    <mat-icon>delete_outline</mat-icon>
+                                </button>
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+        } @else {
+            <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                <div class="h-14 w-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
+                    <mat-icon class="scale-125">inventory_2</mat-icon>
+                </div>
+                <h3 class="text-base font-semibold text-gray-900">No products found</h3>
+                <p class="text-sm text-gray-500 mt-1 max-w-md">
+                    @if (hasActiveFilters()) {
+                        No catalog items match your search or selected brand/category filters.
+                    } @else {
+                        Your catalog is empty. Add your first snow sports product to get started.
+                    }
+                </p>
+                <div class="flex items-center gap-3 mt-4">
+                    @if (hasActiveFilters()) {
+                        <button mat-stroked-button (click)="resetFilters()" class="!border-purple-600 !text-purple-600">
+                            Clear filters
+                        </button>
+                    }
+                    <button mat-flat-button (click)="openCreateDialog()" class="!bg-[#7d00fa] !text-white">
+                        <mat-icon>add</mat-icon>
+                        Add product
+                    </button>
+                </div>
+            </div>
+        }
+
+        <mat-paginator
+            class="border-t border-gray-100"
+            [pageSizeOptions]="[5, 10, 20]"
+            showFirstLastButtons
+            [length]="totalItems()"
+            [pageIndex]="pageIndex()"
+            [pageSize]="pageSize()"
+            (page)="onPageChange($event)" />
+    </div>
+</div>
