@@ -6,6 +6,7 @@ using SkiShop.API.Middleware;
 using SkiShop.Core.Entities;
 using SkiShop.Core.Interfaces;
 using SkiShop.Infrastructure.Data;
+using SkiShop.API.Services;
 using SkiShop.Infrastructure.Services;
 using StackExchange.Redis;
 
@@ -51,6 +52,14 @@ builder.Services.AddScoped<IProductRepository,ProductRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddCors();
+
+// Keep-alive: self-ping every 10 min to prevent SnapDeploy sleep
+builder.Services.AddHttpClient("KeepAlive", client =>
+{
+    client.BaseAddress = new Uri("https://ski-shop-e-commerce-87c0a.containers.snapdeploy.app/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddHostedService<KeepAliveService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
