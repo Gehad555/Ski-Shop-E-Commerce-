@@ -1,9 +1,9 @@
-<div class="min-w-[500px] bg-white rounded-lg">
-  <div class="border-b px-6 py-4">
-    <h3 class="text-2xl font-bold text-center text-gray-800">Filters</h3>
+<div class="w-full bg-white rounded-lg">
+  <div class="border-b px-4 sm:px-6 py-4">
+    <h3 class="text-xl sm:text-2xl font-bold text-center text-gray-800">Filters</h3>
   </div>
-  <div class="flex p-6 gap-6">
-    <div class="w-1/2">
+  <div class="flex flex-col sm:flex-row p-4 sm:p-6 gap-6 max-h-[65vh] overflow-y-auto">
+    <div class="w-full sm:w-1/2">
       <h4 class="font-semibold text-lg text-blue-600 mb-2 flex items-center gap-2">
         <mat-icon class="text-blue-600">label</mat-icon>
         Brands
@@ -15,7 +15,7 @@
         }
       </mat-selection-list>
     </div>
-    <div class="w-1/2">
+    <div class="w-full sm:w-1/2">
       <h4 class="font-semibold text-lg text-blue-600 mb-2 flex items-center gap-2">
         <mat-icon class="text-blue-600">category</mat-icon>
         Types
@@ -28,8 +28,8 @@
       </mat-selection-list>
     </div>
   </div>
-  <div class="flex justify-end px-6 pb-4">
-    <button mat-flat-button (click)="applyFilters()" class="!bg-blue-600 !text-white !px-8 !py-2 !rounded-lg hover:!bg-blue-700 !text-base">
+  <div class="flex justify-end px-4 sm:px-6 pb-4 pt-2 border-t border-gray-100">
+    <button mat-flat-button (click)="applyFilters()" class="w-full sm:w-auto !bg-blue-600 !text-white !px-8 !py-2 !rounded-lg hover:!bg-blue-700 !text-base">
       Apply Filters
     </button>
   </div>

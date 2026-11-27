@@ -1,20 +1,21 @@
-<div class="mx-auto px-4">
-    <div class="flex flex-col relative items-center h-120 justify-center mt-20 rounded-2xl shadow-xl">
-        <img 
-            src="/images/hero1.jpg" 
-            alt="ski resort image"
-            class="w-full h-full object-cover rounded-2xl absolute inset-0"
-        >
-        <div class="flex flex-col p-8 rounded-2xl items-center relative">
-            <h1 class="my-6 font-extrabold text-white text-6xl">
-                Welcome to SkiNet!
-            </h1>
-            <button
-                class="bg-linear-to-r from-blue-600 to-cyan-500 font-semibold text-2xl text-white cursor-pointer rounded-2xl px-8 py-4 border-2 mt-8"
-                routerLink="/shop"
-            >
-                Go to shop
-            </button>
-        </div>
+<div class="mx-auto px-1 sm:px-4">
+  <div class="flex flex-col relative items-center min-h-[340px] sm:min-h-[420px] md:h-[480px] justify-center mt-4 sm:mt-12 md:mt-16 rounded-2xl shadow-xl overflow-hidden">
+    <img
+      src="/images/hero1.jpg"
+      alt="ski resort image"
+      class="w-full h-full object-cover rounded-2xl absolute inset-0"
+    >
+    <div class="absolute inset-0 bg-black/30 rounded-2xl"></div>
+    <div class="flex flex-col p-6 sm:p-8 rounded-2xl items-center text-center relative z-10">
+      <h1 class="my-4 sm:my-6 font-extrabold text-white text-3xl sm:text-5xl md:text-6xl leading-tight drop-shadow-md">
+        Welcome to SkiNet!
+      </h1>
+      <button
+        class="bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold text-lg sm:text-xl md:text-2xl text-white cursor-pointer rounded-2xl px-6 py-3 sm:px-8 sm:py-4 border-2 border-white/80 mt-4 sm:mt-8 shadow-lg hover:opacity-95 transition"
+        routerLink="/shop"
+      >
+        Go to shop
+      </button>
     </div>
+  </div>
 </div>

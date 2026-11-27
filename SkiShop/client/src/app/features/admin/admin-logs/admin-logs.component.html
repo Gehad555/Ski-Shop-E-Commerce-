@@ -1,0 +1,476 @@
+<div class="space-y-6">
+    <!-- Summary KPI Strip -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">System logs</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ stats()?.totalSystemLogs ?? systemTotalItems() }}</p>
+                <p class="text-xs text-gray-500">{{ stats()?.infoCount ?? 0 }} info events</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                <mat-icon>terminal</mat-icon>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Errors</p>
+                <p class="mt-1 text-2xl font-bold text-red-600">{{ stats()?.errorCount ?? 0 }}</p>
+                <p class="text-xs text-gray-500">500s & unhandled</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-red-50 flex items-center justify-center text-red-600">
+                <mat-icon>error_outline</mat-icon>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Warnings</p>
+                <p class="mt-1 text-2xl font-bold text-amber-600">{{ stats()?.warningCount ?? 0 }}</p>
+                <p class="text-xs text-gray-500">4xx HTTP responses</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                <mat-icon>warning_amber</mat-icon>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-gray-500">Audit events</p>
+                <p class="mt-1 text-2xl font-bold text-emerald-700">{{ stats()?.totalAuditLogs ?? auditTotalItems() }}</p>
+                <p class="text-xs text-gray-500">{{ stats()?.auditLast24Hours ?? 0 }} in last 24h</p>
+            </div>
+            <div class="h-11 w-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <mat-icon>verified_user</mat-icon>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Logs & Audit Card -->
+    <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <!-- Toolbar -->
+        <div class="flex flex-col gap-4 px-6 py-5 border-b border-gray-100 bg-gray-50/60">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        {{ activeView() === 'system' ? 'System & request logs' : 'Data audit trail' }}
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-0.5">
+                        @if (activeView() === 'system') {
+                            Monitor API errors, warnings, unhandled exceptions, and request latencies persisted in PostgreSQL.
+                        } @else {
+                            Track who created, modified, refunded, or signed in/out across store entities with field-level diffs.
+                        }
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="inline-flex rounded-lg border border-gray-200 bg-white p-1">
+                        <button
+                            type="button"
+                            (click)="activeView.set('system')"
+                            class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5"
+                            [ngClass]="activeView() === 'system' ? 'bg-[#7d00fa] text-white' : 'text-gray-600 hover:text-gray-900'">
+                            <span>System Logs</span>
+                            @if ((stats()?.errorCount ?? 0) > 0) {
+                                <span
+                                    class="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                                    [ngClass]="activeView() === 'system' ? 'bg-white/20 text-white' : 'bg-red-100 text-red-700'">
+                                    {{ stats()?.errorCount }}
+                                </span>
+                            }
+                        </button>
+                        <button
+                            type="button"
+                            (click)="activeView.set('audit')"
+                            class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5"
+                            [ngClass]="activeView() === 'audit' ? 'bg-[#7d00fa] text-white' : 'text-gray-600 hover:text-gray-900'">
+                            <span>Audit Trail</span>
+                            <span
+                                class="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                                [ngClass]="activeView() === 'audit' ? 'bg-white/20 text-white' : 'bg-purple-100 text-purple-700'">
+                                {{ stats()?.totalAuditLogs ?? auditTotalItems() }}
+                            </span>
+                        </button>
+                    </div>
+
+                    <button
+                        mat-icon-button
+                        matTooltip="Refresh logs & audit data"
+                        (click)="reload()"
+                        class="!text-gray-600 hover:!text-purple-600 hover:!bg-purple-50">
+                        <mat-icon>refresh</mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters Row -->
+            @if (activeView() === 'system') {
+                <div class="flex flex-wrap items-center gap-3">
+                    <form (ngSubmit)="onSystemSearchSubmit()" class="w-full sm:w-72">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full bg-white rounded-md">
+                            <mat-label>Search path, message, user</mat-label>
+                            <input
+                                matInput
+                                name="systemSearch"
+                                [ngModel]="systemSearchInput()"
+                                (ngModelChange)="systemSearchInput.set($event)"
+                                placeholder="e.g. /api/orders or 500" />
+                            <div matSuffix class="flex items-center">
+                                @if (systemSearchInput()) {
+                                    <button mat-icon-button type="button" (click)="clearSystemSearch()" aria-label="Clear search">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                }
+                                <button mat-icon-button type="submit" aria-label="Search logs" class="!text-purple-600">
+                                    <mat-icon>search</mat-icon>
+                                </button>
+                            </div>
+                        </mat-form-field>
+                    </form>
+
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full sm:w-44 bg-white rounded-md">
+                        <mat-label>Level</mat-label>
+                        <mat-select [value]="selectedLevel()" (selectionChange)="onLevelChange($event)">
+                            <mat-option value="All">All levels</mat-option>
+                            @for (level of levelOptions(); track level) {
+                                <mat-option [value]="level">{{ level }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full sm:w-48 bg-white rounded-md">
+                        <mat-label>Source</mat-label>
+                        <mat-select [value]="selectedSource()" (selectionChange)="onSourceChange($event)">
+                            <mat-option value="All">All sources</mat-option>
+                            @for (source of sourceOptions(); track source) {
+                                <mat-option [value]="source">{{ source }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    @if (hasSystemFilters()) {
+                        <button mat-stroked-button type="button" (click)="resetSystemFilters()" class="!border-gray-300 !text-gray-700">
+                            <mat-icon>filter_alt_off</mat-icon>
+                            Clear
+                        </button>
+                    }
+                </div>
+            } @else {
+                <div class="flex flex-wrap items-center gap-3">
+                    <form (ngSubmit)="onAuditSearchSubmit()" class="w-full sm:w-72">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full bg-white rounded-md">
+                            <mat-label>Search details, user, entity #</mat-label>
+                            <input
+                                matInput
+                                name="auditSearch"
+                                [ngModel]="auditSearchInput()"
+                                (ngModelChange)="auditSearchInput.set($event)"
+                                placeholder="e.g. admin@test.com or Price" />
+                            <div matSuffix class="flex items-center">
+                                @if (auditSearchInput()) {
+                                    <button mat-icon-button type="button" (click)="clearAuditSearch()" aria-label="Clear search">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                }
+                                <button mat-icon-button type="submit" aria-label="Search audit trail" class="!text-purple-600">
+                                    <mat-icon>search</mat-icon>
+                                </button>
+                            </div>
+                        </mat-form-field>
+                    </form>
+
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full sm:w-44 bg-white rounded-md">
+                        <mat-label>Action</mat-label>
+                        <mat-select [value]="selectedAction()" (selectionChange)="onActionChange($event)">
+                            <mat-option value="All">All actions</mat-option>
+                            @for (action of actionOptions(); track action) {
+                                <mat-option [value]="action">{{ action }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full sm:w-44 bg-white rounded-md">
+                        <mat-label>Entity</mat-label>
+                        <mat-select [value]="selectedEntity()" (selectionChange)="onEntityChange($event)">
+                            <mat-option value="All">All entities</mat-option>
+                            @for (entity of entityOptions(); track entity) {
+                                <mat-option [value]="entity">{{ entity }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    @if (hasAuditFilters()) {
+                        <button mat-stroked-button type="button" (click)="resetAuditFilters()" class="!border-gray-300 !text-gray-700">
+                            <mat-icon>filter_alt_off</mat-icon>
+                            Clear
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- SYSTEM LOGS TABLE -->
+        @if (activeView() === 'system') {
+            @if (adminService.systemLogsResource.isLoading() && systemLogs().length === 0) {
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="h-10 w-10 rounded-full border-2 border-purple-200 border-t-[#7d00fa] animate-spin mb-3"></div>
+                    <p class="text-sm font-medium text-gray-600">Loading system logs...</p>
+                </div>
+            } @else if (systemLogs().length > 0) {
+                <div class="overflow-x-auto">
+                    <table mat-table [dataSource]="systemLogs()" class="w-full">
+                        <ng-container matColumnDef="timestamp">
+                            <th mat-header-cell *matHeaderCellDef>Time</th>
+                            <td mat-cell *matCellDef="let log" class="text-xs text-gray-600 whitespace-nowrap">
+                                {{ log.timestamp | date: 'MMM d, h:mm:ss a' }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="level">
+                            <th mat-header-cell *matHeaderCellDef>Level</th>
+                            <td mat-cell *matCellDef="let log">
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold border whitespace-nowrap"
+                                    [ngClass]="getLevelBadgeClass(log.level)">
+                                    <span class="h-1.5 w-1.5 rounded-full" [ngClass]="getLevelDotClass(log.level)"></span>
+                                    {{ log.level }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="source">
+                            <th mat-header-cell *matHeaderCellDef>Source</th>
+                            <td mat-cell *matCellDef="let log">
+                                <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 whitespace-nowrap">
+                                    {{ log.source }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="request">
+                            <th mat-header-cell *matHeaderCellDef>Request</th>
+                            <td mat-cell *matCellDef="let log">
+                                @if (log.requestMethod || log.requestPath) {
+                                    <div class="flex items-center gap-1.5 flex-wrap py-1">
+                                        @if (log.statusCode) {
+                                            <span
+                                                class="rounded px-1.5 py-0.5 text-[11px] font-bold"
+                                                [ngClass]="getStatusBadgeClass(log.statusCode)">
+                                                {{ log.statusCode }}
+                                            </span>
+                                        }
+                                        <span class="font-mono text-xs text-gray-800 max-w-[220px] truncate" [matTooltip]="(log.requestMethod || '') + ' ' + (log.requestPath || '')">
+                                            {{ log.requestMethod }} {{ log.requestPath }}
+                                        </span>
+                                        @if (log.durationMs !== null && log.durationMs !== undefined) {
+                                            <span class="text-[11px] text-gray-400">{{ log.durationMs }}ms</span>
+                                        }
+                                    </div>
+                                } @else {
+                                    <span class="text-xs text-gray-400">—</span>
+                                }
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="message">
+                            <th mat-header-cell *matHeaderCellDef>Message</th>
+                            <td mat-cell *matCellDef="let log">
+                                <div class="py-1 max-w-xs">
+                                    <p class="text-sm text-gray-800 line-clamp-1">{{ log.message }}</p>
+                                    @if (log.exception) {
+                                        <p class="text-xs text-red-600 font-mono truncate">{{ log.exception }}</p>
+                                    }
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="user">
+                            <th mat-header-cell *matHeaderCellDef>Actor</th>
+                            <td mat-cell *matCellDef="let log">
+                                <div class="flex flex-col py-1">
+                                    <span class="text-sm font-medium text-gray-800">{{ log.userEmail || 'Anonymous' }}</span>
+                                    @if (log.ipAddress) {
+                                        <span class="text-xs text-gray-400">{{ log.ipAddress }}</span>
+                                    }
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef class="!text-right">Details</th>
+                            <td mat-cell *matCellDef="let log">
+                                <div class="flex items-center justify-end">
+                                    <button
+                                        mat-icon-button
+                                        matTooltip="Inspect full log & stack trace"
+                                        (click)="inspectSystemLog(log); $event.stopPropagation()"
+                                        class="!text-purple-600 hover:!bg-purple-50">
+                                        <mat-icon>visibility</mat-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="systemColumns"></tr>
+                        <tr
+                            mat-row
+                            *matRowDef="let row; columns: systemColumns;"
+                            (click)="inspectSystemLog(row)"
+                            class="cursor-pointer"></tr>
+                    </table>
+                </div>
+            } @else {
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="h-14 w-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
+                        <mat-icon class="scale-125">terminal</mat-icon>
+                    </div>
+                    <h3 class="text-base font-semibold text-gray-900">No system logs found</h3>
+                    <p class="text-sm text-gray-500 mt-1 max-w-md">
+                        @if (hasSystemFilters()) {
+                            No log entries matched your active search or level/source filters.
+                        } @else {
+                            API requests, 4xx/5xx warnings, and unhandled exceptions will be recorded here automatically.
+                        }
+                    </p>
+                    @if (hasSystemFilters()) {
+                        <button mat-stroked-button class="mt-4 !border-purple-600 !text-purple-600" (click)="resetSystemFilters()">
+                            Clear filters
+                        </button>
+                    }
+                </div>
+            }
+
+            <mat-paginator
+                class="border-t border-gray-100"
+                [pageSizeOptions]="[10, 20, 50]"
+                showFirstLastButtons
+                [length]="systemTotalItems()"
+                [pageIndex]="systemPageIndex()"
+                [pageSize]="systemPageSize()"
+                (page)="onSystemPageChange($event)" />
+        } @else {
+            <!-- AUDIT TRAIL TABLE -->
+            @if (adminService.auditLogsResource.isLoading() && auditLogs().length === 0) {
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="h-10 w-10 rounded-full border-2 border-purple-200 border-t-[#7d00fa] animate-spin mb-3"></div>
+                    <p class="text-sm font-medium text-gray-600">Loading audit trail...</p>
+                </div>
+            } @else if (auditLogs().length > 0) {
+                <div class="overflow-x-auto">
+                    <table mat-table [dataSource]="auditLogs()" class="w-full">
+                        <ng-container matColumnDef="timestamp">
+                            <th mat-header-cell *matHeaderCellDef>Time</th>
+                            <td mat-cell *matCellDef="let audit" class="text-xs text-gray-600 whitespace-nowrap">
+                                {{ audit.timestamp | date: 'MMM d, h:mm:ss a' }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="action">
+                            <th mat-header-cell *matHeaderCellDef>Action</th>
+                            <td mat-cell *matCellDef="let audit">
+                                <span
+                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border whitespace-nowrap"
+                                    [ngClass]="getActionBadgeClass(audit.action)">
+                                    {{ audit.action }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="entity">
+                            <th mat-header-cell *matHeaderCellDef>Entity</th>
+                            <td mat-cell *matCellDef="let audit">
+                                <span class="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 whitespace-nowrap">
+                                    <span>{{ audit.entityName }}</span>
+                                    @if (audit.entityId) {
+                                        <span class="text-purple-700 font-semibold">#{{ audit.entityId }}</span>
+                                    }
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="user">
+                            <th mat-header-cell *matHeaderCellDef>User</th>
+                            <td mat-cell *matCellDef="let audit">
+                                <div class="flex flex-col py-1">
+                                    <span class="text-sm font-medium text-gray-900">{{ audit.userEmail || 'System' }}</span>
+                                    @if (audit.ipAddress) {
+                                        <span class="text-xs text-gray-400">{{ audit.ipAddress }}</span>
+                                    }
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="details">
+                            <th mat-header-cell *matHeaderCellDef>Summary & Changes</th>
+                            <td mat-cell *matCellDef="let audit">
+                                <div class="py-1.5 space-y-1 max-w-md">
+                                    <p class="text-sm text-gray-800 line-clamp-1">{{ audit.details || '—' }}</p>
+                                    @if (splitColumns(audit.affectedColumns).length > 0) {
+                                        <div class="flex flex-wrap gap-1">
+                                            @for (col of splitColumns(audit.affectedColumns); track col) {
+                                                <span class="rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+                                                    {{ col }}
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef class="!text-right">Inspect</th>
+                            <td mat-cell *matCellDef="let audit">
+                                <div class="flex items-center justify-end">
+                                    <button
+                                        mat-icon-button
+                                        matTooltip="View field values & audit details"
+                                        (click)="inspectAuditLog(audit); $event.stopPropagation()"
+                                        class="!text-purple-600 hover:!bg-purple-50">
+                                        <mat-icon>{{ (audit.oldValues || audit.newValues) ? 'difference' : 'visibility' }}</mat-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="auditColumns"></tr>
+                        <tr
+                            mat-row
+                            *matRowDef="let row; columns: auditColumns;"
+                            (click)="inspectAuditLog(row)"
+                            class="cursor-pointer"></tr>
+                    </table>
+                </div>
+            } @else {
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="h-14 w-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
+                        <mat-icon class="scale-125">history</mat-icon>
+                    </div>
+                    <h3 class="text-base font-semibold text-gray-900">No audit records found</h3>
+                    <p class="text-sm text-gray-500 mt-1 max-w-md">
+                        @if (hasAuditFilters()) {
+                            No audit entries matched your search or action/entity filters.
+                        } @else {
+                            Account sign-ins, product updates, order creation, and refunds will be audited here automatically.
+                        }
+                    </p>
+                    @if (hasAuditFilters()) {
+                        <button mat-stroked-button class="mt-4 !border-purple-600 !text-purple-600" (click)="resetAuditFilters()">
+                            Clear filters
+                        </button>
+                    }
+                </div>
+            }
+
+            <mat-paginator
+                class="border-t border-gray-100"
+                [pageSizeOptions]="[10, 20, 50]"
+                showFirstLastButtons
+                [length]="auditTotalItems()"
+                [pageIndex]="auditPageIndex()"
+                [pageSize]="auditPageSize()"
+                (page)="onAuditPageChange($event)" />
+        }
+    </div>
+</div>

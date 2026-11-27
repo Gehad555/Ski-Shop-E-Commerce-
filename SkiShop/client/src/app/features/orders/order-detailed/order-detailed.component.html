@@ -1,16 +1,16 @@
 @if (orderResource.value(); as order) {
-<mat-card class="py-8 shadow-md max-w-4xl mx-auto bg-(--mat-sys-surface)! flex flex-col gap-8">
-    <mat-card-header class="flex items-center justify-center gap-3 text-3xl font-semibold">
+<mat-card class="py-6 sm:py-8 shadow-md max-w-4xl mx-auto !bg-[var(--mat-sys-surface)] flex flex-col gap-6 sm:gap-8">
+    <mat-card-header class="flex flex-wrap items-center justify-center gap-3 text-xl sm:text-3xl font-semibold text-center px-4">
         <span>Order summary for #{{order.id}}</span>
         <mat-chip [ngClass]="{
-            'bg-green-100!': order.status === 'PaymentReceived',
-            'bg-amber-100!': order.status === 'Pending'
+            '!bg-green-100': order.status === 'PaymentReceived',
+            '!bg-amber-100': order.status === 'Pending'
             }">
             {{order.status | splitCamelCase}}
         </mat-chip>
     </mat-card-header>
     <mat-card-content>
-        <div class="grid grid-cols-2 gap-4 mx-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mx-2 sm:mx-6">
             <div>
                 <h4 class="text-lg font-semibold">Billing and delivery info</h4>
                 <dl>
@@ -39,29 +39,31 @@
                 <h4 class="text-lg font-semibold">Order details</h4>
                 <dl>
                     <dt class="font-medium text-gray-700">Buyer email</dt>
-                    <dd class="mt-1 font-light text-gray-600">{{order.buyerEmail}}</dd>
+                    <dd class="mt-1 font-light text-gray-600 break-all">{{order.buyerEmail}}</dd>
                     <dt class="font-medium text-gray-700 mt-2">Order date</dt>
                     <dd class="mt-1 font-light text-gray-600">{{order.orderDate | date: 'medium'}}</dd>
                 </dl>
             </div>
         </div>
 
-        <table class="mt-6 divide-y divide-gray-300 w-full bg-(--mat-sys-surface-container-low) rounded-xl">
-            @for (item of order.orderItems; track item.productId) {
-            <tr>
-                <td class="p-4">
-                    <div class="flex items-center gap-4">
-                        <img src="{{item.pictureUrl}}" alt="product image" class="w-10 h-10 object-contain">
-                        <span class="font-medium">{{item.productName}}</span>
-                    </div>
-                </td>
-                <td class="p-4 text-center">x{{item.quantity}}</td>
-                <td class="p-4 text-right font-medium">{{item.price | currency}}</td>
-            </tr>
-            }
-        </table>
+        <div class="mt-6 overflow-x-auto rounded-xl">
+            <table class="divide-y divide-gray-300 w-full bg-[var(--mat-sys-surface-container-low)] rounded-xl">
+                @for (item of order.orderItems; track item.productId) {
+                <tr>
+                    <td class="p-3 sm:p-4">
+                        <div class="flex items-center gap-3 sm:gap-4 min-w-[180px]">
+                            <img src="{{item.pictureUrl}}" alt="product image" class="w-10 h-10 object-contain shrink-0">
+                            <span class="font-medium">{{item.productName}}</span>
+                        </div>
+                    </td>
+                    <td class="p-3 sm:p-4 text-center whitespace-nowrap">x{{item.quantity}}</td>
+                    <td class="p-3 sm:p-4 text-right font-medium whitespace-nowrap">{{item.price | currency}}</td>
+                </tr>
+                }
+            </table>
+        </div>
 
-        <div class="space-y-4 mx-6 mt-6">
+        <div class="space-y-4 mx-2 sm:mx-6 mt-6">
             <dl class="flex items-center justify-between gap-4">
                 <dt class="font-light">Subtotal</dt>
                 <dd>{{order.subtotal | currency}}</dd>
@@ -80,7 +82,7 @@
             </dl>
         </div>
     </mat-card-content>
-    <mat-card-actions class="flex justify-between mx-6">
+    <mat-card-actions class="flex flex-wrap justify-between gap-3 mx-2 sm:mx-6">
         <button (click)="onReturnClick()" mat-flat-button>{{buttonText()}}</button>
         <button routerLink="/shop" mat-stroked-button>Continue shopping</button>
     </mat-card-actions>

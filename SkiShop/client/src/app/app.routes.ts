@@ -49,8 +49,15 @@ export const routes: Routes = [
     loadComponent: () => import('./features/account/register/register.component').then(m => m.RegisterComponent)
   },
   {
+    path: 'logs',
+    loadComponent: () => import('./features/admin/admin.component').then(m => m.Admin),
+    canActivate: [authGuard, adminGuard],
+    data: { initialTab: 3 }
+  },
+  {
     path: 'test-error',
-    loadComponent: () => import('./features/test-error/test-error.component').then(m => m.TestErrorComponent)
+    redirectTo: 'logs',
+    pathMatch: 'full'
   },
   {
     path: 'server-error',

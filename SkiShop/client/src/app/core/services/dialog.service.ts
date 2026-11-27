@@ -12,6 +12,7 @@ export class DialogService {
   confirm(title: string, message: string) {
     const dialogRef = this.dialog.open(ConfirmationDialog, {
       width: '400px',
+      maxWidth: '95vw',
       data: { title, message }
     });
 

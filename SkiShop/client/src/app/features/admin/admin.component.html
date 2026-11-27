@@ -13,7 +13,7 @@
                     </span>
                 </div>
                 <p class="text-sm text-gray-500 mt-0.5">
-                    Manage customer orders, product catalog inventory, and customer support requests.
+                    Manage customer orders, product catalog inventory, customer support, and system & audit logs.
                 </p>
             </div>
         </div>
@@ -78,6 +78,25 @@
             <ng-template matTabContent>
                 <div class="pt-6">
                     <app-admin-customer-service />
+                </div>
+            </ng-template>
+        </mat-tab>
+
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <div class="flex items-center gap-2">
+                    <mat-icon class="!text-lg !w-[18px] !h-[18px]">article</mat-icon>
+                    <span>Logs</span>
+                    @if ((errorLogsCount() ?? 0) > 0) {
+                        <span class="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-700">
+                            {{ errorLogsCount() }} err
+                        </span>
+                    }
+                </div>
+            </ng-template>
+            <ng-template matTabContent>
+                <div class="pt-6">
+                    <app-admin-logs />
                 </div>
             </ng-template>
         </mat-tab>

@@ -1,4 +1,6 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { afterRenderEffect, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatStepper, MatStep, MatStepperNext, MatStepperPrevious } from '@angular/material/stepper';
 import { StripeService } from '../../core/services/stripe.service';
 import { MatButton } from '@angular/material/button';
@@ -6,7 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { AccountService } from '../../core/services/account.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
 import { CurrencyPipe } from '@angular/common';
 import { SnackbarService } from '../../core/services/snackbar.service';
 import { StripeError } from '@stripe/stripe-js';
@@ -56,6 +58,12 @@ export class Checkout {
   protected loading = signal(false);
   private router = inject(Router);
   private orderService = inject(OrderService);
+  private breakpointObserver = inject(BreakpointObserver);
+
+  protected isMobile = toSignal(
+    this.breakpointObserver.observe('(max-width: 767px)').pipe(map(result => result.matches)),
+    { initialValue: false }
+  );
 
   protected checkoutComplete = computed(() => {
     return this.addressComplete() && this.deliveryComplete() && this.paymentComplete();

@@ -6,10 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using SkiShop.API.DTOs;
 using SkiShop.API.Extensions;
 using SkiShop.Core.Entities;
+using SkiShop.Core.Interfaces;
+using SkiShop.Infrastructure.Data;
 
 namespace SkiShop.API.Controller
 {
-    public class AccountController(SignInManager<AppUser> signInManager) : BaseApiController
+    public class AccountController(
+        SignInManager<AppUser> signInManager,
+        StoreContext context,
+        ICurrentUserService currentUserService) : BaseApiController
     {
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterDto registerDto)
@@ -34,6 +39,19 @@ namespace SkiShop.API.Controller
                 return ValidationProblem();
             }
 
+            context.AuditLogs.Add(new AuditLog
+            {
+                Action = "Registered",
+                EntityName = "User",
+                EntityId = user.Id,
+                UserEmail = user.Email,
+                UserId = user.Id,
+                IpAddress = currentUserService.IpAddress,
+                Details = $"Registered new customer account {user.Email}",
+                Timestamp = DateTime.UtcNow
+            });
+            await context.SaveChangesAsync();
+
             return Ok();
         }
 
@@ -42,7 +60,23 @@ namespace SkiShop.API.Controller
         [HttpPost("logout")]
         public async Task<ActionResult> Logout()
         {
+            var email = User.GetEmail();
+            var userId = currentUserService.UserId;
             await signInManager.SignOutAsync();
+
+            context.AuditLogs.Add(new AuditLog
+            {
+                Action = "Logout",
+                EntityName = "Auth",
+                EntityId = userId,
+                UserEmail = email,
+                UserId = userId,
+                IpAddress = currentUserService.IpAddress,
+                Details = $"User {email} signed out",
+                Timestamp = DateTime.UtcNow
+            });
+            await context.SaveChangesAsync();
+
             return NoContent();
         }
 

@@ -6,6 +6,7 @@ import { Pagination } from '../../shared/models/pagination';
 import { Order } from '../../shared/models/order';
 import { Product } from '../../shared/models/product';
 import { ShopParams } from '../../shared/models/shopParams';
+import { AuditLog, AuditLogParams, LogStats, SystemLog, SystemLogParams } from '../../shared/models/logs';
 import { tap } from 'rxjs';
 
 export type SupportCaseStatus = 'Open' | 'InProgress' | 'Resolved';
@@ -60,6 +61,7 @@ export class AdminService {
         if (this.supportActive()) {
           this.supportOrdersResource.reload();
         }
+        this.reloadLogsIfActive();
       })
     );
   }
@@ -98,19 +100,28 @@ export class AdminService {
 
   createProduct(product: ProductPayload) {
     return this.http.post<Product>(`${this.baseUrl}products`, product).pipe(
-      tap(() => this.productsResource.reload())
+      tap(() => {
+        this.productsResource.reload();
+        this.reloadLogsIfActive();
+      })
     );
   }
 
   updateProduct(product: Product) {
     return this.http.put<void>(`${this.baseUrl}products/${product.id}`, product).pipe(
-      tap(() => this.productsResource.reload())
+      tap(() => {
+        this.productsResource.reload();
+        this.reloadLogsIfActive();
+      })
     );
   }
 
   deleteProduct(id: number) {
     return this.http.delete<void>(`${this.baseUrl}products/${id}`).pipe(
-      tap(() => this.productsResource.reload())
+      tap(() => {
+        this.productsResource.reload();
+        this.reloadLogsIfActive();
+      })
     );
   }
 
@@ -174,6 +185,82 @@ export class AdminService {
       localStorage.setItem(SUPPORT_CASES_STORAGE_KEY, JSON.stringify(data));
     } catch {
       // Ignore storage quota errors
+    }
+  }
+
+  // ---------------- Logs & Audit ----------------
+  logsActive = signal(false);
+
+  systemLogParams = signal<SystemLogParams>({
+    pageNumber: 1,
+    pageSize: 10,
+    level: '',
+    source: '',
+    search: ''
+  });
+
+  auditLogParams = signal<AuditLogParams>({
+    pageNumber: 1,
+    pageSize: 10,
+    action: '',
+    entityName: '',
+    search: ''
+  });
+
+  readonly systemLogsResource = httpResource<Pagination<SystemLog>>(() => {
+    if (!this.logsActive()) return undefined;
+
+    const { pageNumber, pageSize, level, source, search } = this.systemLogParams();
+    let params = new HttpParams()
+      .append('pageIndex', pageNumber)
+      .append('pageSize', pageSize);
+
+    if (level && level !== 'All') params = params.append('level', level);
+    if (source && source !== 'All') params = params.append('source', source);
+    if (search && search.trim()) params = params.append('search', search.trim());
+
+    return {
+      url: `${this.baseUrl}admin/logs`,
+      params
+    };
+  });
+
+  readonly auditLogsResource = httpResource<Pagination<AuditLog>>(() => {
+    if (!this.logsActive()) return undefined;
+
+    const { pageNumber, pageSize, action, entityName, search } = this.auditLogParams();
+    let params = new HttpParams()
+      .append('pageIndex', pageNumber)
+      .append('pageSize', pageSize);
+
+    if (action && action !== 'All') params = params.append('action', action);
+    if (entityName && entityName !== 'All') params = params.append('entityName', entityName);
+    if (search && search.trim()) params = params.append('search', search.trim());
+
+    return {
+      url: `${this.baseUrl}admin/audit`,
+      params
+    };
+  });
+
+  readonly logStatsResource = httpResource<LogStats>(() => {
+    if (!this.logsActive()) return undefined;
+
+    return {
+      url: `${this.baseUrl}admin/logs/stats`
+    };
+  });
+
+  reloadLogsSection() {
+    this.logsActive.set(true);
+    this.systemLogsResource.reload();
+    this.auditLogsResource.reload();
+    this.logStatsResource.reload();
+  }
+
+  private reloadLogsIfActive() {
+    if (this.logsActive()) {
+      this.reloadLogsSection();
     }
   }
 }

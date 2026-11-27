@@ -1,6 +1,6 @@
-<div class="min-h-[75vh] flex items-center justify-center px-4 py-12">
-  <mat-card class="w-full max-w-md p-8 shadow-lg rounded-2xl border border-gray-100 bg-white">
-    <div class="text-center mb-8">
+<div class="min-h-[75vh] flex items-center justify-center px-3 sm:px-4 py-8 sm:py-12">
+  <mat-card class="w-full max-w-md p-5 sm:p-8 shadow-lg rounded-2xl border border-gray-100 bg-white">
+    <div class="text-center mb-6 sm:mb-8">
       <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-violet-100 text-violet-600 mb-3">
         <mat-icon class="scale-125">lock_open</mat-icon>
       </div>
@@ -32,6 +32,13 @@
           <mat-error>Password is required</mat-error>
         }
       </mat-form-field>
+
+      @if (errorMessage(); as error) {
+        <div role="alert" class="mb-4 p-3.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-2.5">
+          <mat-icon class="!text-lg !w-[18px] !h-[18px] shrink-0 mt-0.5 text-red-600">error_outline</mat-icon>
+          <span>{{ error }}</span>
+        </div>
+      }
 
       <button [disabled]="loginForm.invalid || loading()" mat-flat-button type="submit" class="w-full py-2.5 text-base font-medium rounded-lg">
         {{loading() ? 'Signing in...' : 'Sign in'}}

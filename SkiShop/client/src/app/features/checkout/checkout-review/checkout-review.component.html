@@ -28,18 +28,18 @@
 
 </div>
 
-<div class="mt-6 mx-auto w-full">
-    <table class="divide-y divide-gray-300 w-full bg-(--mat-sys-surface-container-low) rounded-xl">
+<div class="mt-6 mx-auto w-full overflow-x-auto rounded-xl">
+    <table class="divide-y divide-gray-300 w-full bg-[var(--mat-sys-surface-container-low)] rounded-xl">
         @for (item of cartService.cartResource.value()?.items; track item.productId) {
             <tr>
-               <td class="p-4">
-                    <div class="flex items-center gap-4">
-                        <img src="{{item.pictureUrl}}" alt="product image" class="w-10 h-10">
+               <td class="p-3 sm:p-4">
+                    <div class="flex items-center gap-3 sm:gap-4 min-w-[180px]">
+                        <img src="{{item.pictureUrl}}" alt="product image" class="w-10 h-10 object-contain shrink-0">
                         <span>{{item.productName}}</span>
                     </div>
                </td> 
-               <td class="p-4">x{{item.quantity}}</td>
-               <td class="p-4 text-right">{{item.price | currency}}</td>
+               <td class="p-3 sm:p-4 whitespace-nowrap">x{{item.quantity}}</td>
+               <td class="p-3 sm:p-4 text-right whitespace-nowrap">{{item.price | currency}}</td>
             </tr>
         }
     </table>

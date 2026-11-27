@@ -1,10 +1,11 @@
-<div class="flex w-full gap-6">
-    <div class="w-3/4">
+<div class="flex flex-col lg:flex-row w-full gap-6">
+    <div class="w-full lg:w-3/4">
         <mat-stepper 
             #stepper
             [linear]="true"
+            [orientation]="isMobile() ? 'vertical' : 'horizontal'"
             (selectionChange)="onStepChange($event)" 
-            class="bg-(--mat-sys-surface) shadow-sm border border-gray-300 rounded-xl"
+            class="!bg-[var(--mat-sys-surface)] shadow-sm border border-gray-300 rounded-xl"
         >
             <mat-step label="Address" [completed]="addressComplete()">
                 <div id="address-element"></div>
@@ -17,14 +18,14 @@
                     </mat-checkbox>
                 </div>
 
-                <div class="flex justify-between mt-6">
+                <div class="flex flex-wrap justify-between gap-3 mt-6">
                     <button class="z-0" mat-stroked-button routerLink="/shop">Continue shopping</button>
                     <button [disabled]="!addressComplete()" mat-flat-button matStepperNext>Next</button>
                 </div>
             </mat-step>
             <mat-step label="Shipping" [completed]="deliveryComplete()">
                 <app-checkout-delivery (deliveryComplete)="deliveryComplete.set($event)" />
-                <div class="flex justify-between mt-6">
+                <div class="flex flex-wrap justify-between gap-3 mt-6">
                     <button mat-stroked-button matStepperPrevious>Back</button>
                     <button [disabled]="!deliveryComplete()" mat-flat-button matStepperNext>
                         Next
@@ -33,7 +34,7 @@
             </mat-step>
             <mat-step label="Payment" [completed]="paymentComplete()">
                 <div id="payment-element"></div>
-                <div class="flex justify-between mt-6">
+                <div class="flex flex-wrap justify-between gap-3 mt-6">
                     <button mat-stroked-button matStepperPrevious>Back</button>
                     <button 
                         [disabled]="!paymentComplete() || loading()" 
@@ -46,7 +47,7 @@
             </mat-step>
             <mat-step label="Confirmation">
                 <app-checkout-review />
-                <div class="flex justify-between mt-6">
+                <div class="flex flex-wrap justify-between gap-3 mt-6">
                     <button mat-stroked-button matStepperPrevious>Back</button>
                     <button 
                         [disabled]="!checkoutComplete() || processing()" 
@@ -60,7 +61,7 @@
             </mat-step>
         </mat-stepper>
     </div>
-    <div class="w-1/4">
+    <div class="w-full lg:w-1/4">
         <app-order-summary />
     </div>
 </div>
